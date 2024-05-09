@@ -1,4 +1,4 @@
----
+<!-- ---
 layout: post
 title:  "이제 나도 github에서 블로그 한다!!!!!"
 date:   2024-05-08
@@ -27,4 +27,4 @@ rzp.capture(payment_id, cost)
 
 [jekyll-docs]: https://jekyllrb.com/docs/home
 [jekyll-gh]:   https://github.com/jekyll/jekyll
-[jekyll-talk]: https://talk.jekyllrb.com/ -->
+[jekyll-talk]: https://talk.jekyllrb.com/ --> -->
