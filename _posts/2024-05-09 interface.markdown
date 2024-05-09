@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "TIL(20240509) JAVA : 인터페이스"
-date:   2024-05-09
+date:  2024-05-09 
 categories: JAVA TIL
 ---
 
