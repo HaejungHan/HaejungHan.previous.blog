@@ -1,11 +1,11 @@
-<!-- ---
+---
 layout: post
 title:  "TIL(20240510) 코딩테스트 : 정수 제곱근 판별"
 date:  2024-05-09 
 categories: TIL 코딩테스트
 ---
-20240510 코딩테스트
 
+---------------------------------------------------------------------
 ===
 
 ## 🔒 문제
@@ -34,4 +34,4 @@ n이 양의 정수 x의 제곱이라면 x+1의 제곱을 리턴하고, n이 양�
 
 <!-- [jekyll-docs]: https://jekyllrb.com/docs/home
 [jekyll-gh]:   https://github.com/jekyll/jekyll
-[jekyll-talk]: https://talk.jekyllrb.com/ --> 
+[jekyll-talk]: https://talk.jekyllrb.com/ 
