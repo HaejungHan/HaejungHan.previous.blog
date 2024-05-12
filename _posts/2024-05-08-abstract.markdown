@@ -126,5 +126,6 @@ public class Main {
 
 ```
 
-[자바 추상클래스란?]: https://limkydev.tistory.com/188#google_vignette
+-----------------------------------------------------
 
+[자바 추상클래스란?]: https://limkydev.tistory.com/188#google_vignette
