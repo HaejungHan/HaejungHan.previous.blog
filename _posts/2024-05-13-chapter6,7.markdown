@@ -40,18 +40,41 @@ categories: TIL JAVA Spring 코딩테스트
 
 
 # 💡 필요했던 메서드
-1. Arrays.sort()로 int 배열을 인자로 전달하면 오름차순으로 정렬됩니다. 
-2. 내림차순으로 정렬하려면 sort()의 인자에 추가로 Collections.reverseOrder()를 전달해야 합니다.
-
+1. Arrays.sort(a) : 배열 a 내 요소들을 오름차순으로 정렬 / import필수 :import java.util.Arrays;
+2. split("") : 저장된 문자열을 ""<-기준으로 배열에 각각 저장
+3. Collections.reverseOrder() : 오름차순을 내림차순으로 정렬
+4. Long.parseLong() : Long타입으로 변환
+5. String.valueOf() : String타입으로 변환
 
 # 🔓 문제풀이
 ```java
+import java.util.*;
 
+class Solution {
+    public long solution(long n) {
+        long answer = 0;
+        // Long타입 n을 String으로 변경하여 배열에 한 글자씩 저장
+        String[] arr = String.valueOf(n).split("");
+        
+        // 내림차순 정렬
+        Arrays.sort(arr, Collections.reverseOrder());
+        
+        String str = new String(); // String타입 객체생성
+        for(int i=0; i<arr.length; i++){ 
+            str += arr[i]; // 객체에 담기
+        }
+        answer = Long.parseLong(str); // Long타입 변환
+        return answer;
+        }
+    }
 ```
 
 ## 🤷‍♀️ 문제풀이를 하면서 느낀점
-
-
+: 쉽게 풀 수 있는 방법을 모르니, 정말 헤맸던 것 같다.
+2차원 배열로 arr[i]값을 비교하여 큰 수부터 배열에 넣을까 햇는데,
+너무 복잡해지는 것 같아 메서드를 활용하여 쉽게 풀 수 있는 방법을 구글링하여 계속 찾았던 것 같다.
+해야할 공부가 많아서 그런지 코딩테스트는 빨리빨리 풀어야된다는 압박감이 큰 것 같다.
+하지만 코딩테스트도 개발에 도움되는 요소들이 많으니 .. 이 공부 또한 꼼꼼히 해야하는데...ㅠ_ㅠ.. 흐힝
 
 ---------------------------------------------------
 
