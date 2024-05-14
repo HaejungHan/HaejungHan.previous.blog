@@ -51,7 +51,13 @@ categories: TIL JAVA Spring 코딩테스트
 .keySet()
 ```
 
-[![spring_error](/error.png)]()
+```java
+🔒 error 1: Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+🔓 error 1 해결방법 : Run -> edit configurations-> modify options -> enable debug output (오류 내역을 상세히 알려줌..error2로 인해서 발생된 오류 같음..)
+
+🔒 error 2: Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop' (이미 사용중 포트이기 때문에 포트 번호 바꿔야함)
+🔓 error 2 해결방법: resources -> application.properties -> server.port=8090(포트번호 변경) 
+```
 
 ---------------------------------------------------------------------
 
