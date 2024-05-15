@@ -9,7 +9,7 @@ categories: TIL JAVA Spring 코딩테스트
 
 ## 🙌 오늘의 공부목록
 - Spring : 1주차 강의 정리
-- JAVA : 자바의 정석 chapter 7 마무리 chapter 8 강의 끝내기
+- ~~JAVA : 자바의 정석 chapter 7 마무리 chapter 8 강의 듣기~~
 - ~~코딩테스트 : 프로그래머스 2문제~~
 - Spring : 강의 2주차 -8까지 듣기
 
@@ -350,14 +350,10 @@ static void startInstall() throws SpaceException { // 필수예외만 throws
 ---------------------------------------------------------------------
 
 # 📌 Spring
-- 메소드 키워드 정리 : 
 
 ```java
-.stream()
-.values()
-.map()
-.toList()
-.keySet()
+My SQL error 1: Access denied for user ''@'localhost' (using password: YES)
+
 ```
 
 ---------------------------------------------------------------------
