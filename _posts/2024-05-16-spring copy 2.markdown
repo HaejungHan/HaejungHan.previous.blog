@@ -7,6 +7,10 @@ categories: TIL JAVA Spring 코딩테스트
 
 ---------------------------------------------------------------------
 
+- 나는 왜 이렇게 코드를 작성했는가?
+- 
+- 나는 왜 이 기술을 사용했는가?
+
 ## 🙌 오늘의 공부목록
 - Spring 2주차 강의 듣기 
 - Spring 개인과제 필수기능구현까지 해보기
@@ -24,12 +28,32 @@ categories: TIL JAVA Spring 코딩테스트
 
 ---------------------------------------------------------------------
 
+
 # 📌 Spring
 
+# 📌 MySQL
+## 💡 DB 선택 -> 테이블 조회
+```
+//client
+show tables;
+show databases;
+
+use 데이터베이스명;
+select database();
+show tables;
+
+select * from 데이터베이스명;
+```
+
+
 ```java
+My SQL error1 : Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed: org.springframework.jdbc.BadSqlGrammarException: StatementCallback; bad SQL grammar [SELECT * FROM memo]] with root cause
 
 
 ```
+https://velog.io/@hyeddo/MySQL-%EC%99%84%EC%A0%84-%EC%82%AD%EC%A0%9C-%ED%9B%84-%EC%9E%AC%EC%84%A4%EC%B9%98%ED%95%98%EA%B8%B0
+
+winver
 
 ---------------------------------------------------------------------
 
