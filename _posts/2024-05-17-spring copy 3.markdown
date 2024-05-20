@@ -9,8 +9,8 @@ categories: TIL JAVA Spring 코딩테스트
 
 
 ## 🙌 오늘의 공부목록
-- JAVA chapter 9 강의듣기
-- JAVA 강의듣고 정리하기
+- ~~JAVA chapter 9 강의듣기~~
+- ~~JAVA 강의듣고 정리하기~~
 - ~~코딩테스트 문제풀기~~
 
 ---
