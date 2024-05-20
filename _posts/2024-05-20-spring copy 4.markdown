@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "TIL(20240520) JAVA: ; Spring; 코딩테스트: 서울에서 김서방 찾기;"
+title:  "TIL(20240520) JAVA:제네릭스, 스트림; Spring; 코딩테스트: 서울에서 김서방 찾기;"
 date:  2024-05-20
 categories: TIL JAVA Spring 코딩테스트
 ---
@@ -9,24 +9,23 @@ categories: TIL JAVA Spring 코딩테스트
 
 ## 🙌 오늘의 공부목록
 - JAVA 9강~10강 강의듣기
-- 과제 피드백 받은 거 수정하기
-
-## 🔄 내일의 공부목록
-
-### ✔ 오늘 하루 느낀점
+- ~~과제 피드백 수정하기~~
+- Spring 1주차 복습 강의듣기
+- JAVA, Spring 강의 정리
 
 ---
 
 # 📌 JAVA  
-  
-## 💡 String 클래스의 생성자와 메서드
 
+## 💡
+- 
 
 
 ---------------------------------------------------------------------
 
 
 # 📌 Spring
+- gradle이란? 버전을 설정하고 라이브러리를 가져오는 것 !
 
 # 📌 MySQL
 
@@ -34,69 +33,59 @@ categories: TIL JAVA Spring 코딩테스트
 
 ---------------------------------------------------------------------
 
-# 📌 코딩테스트 1: 콜라츠 추측
+# 📌 코딩테스트 : 서울에서 김서방 찾기
 
-## 🔒 문제 : 1937년 Collatz란 사람에 의해 제기된 이 추측은, 주어진 수가 1이 될 때까지 다음 작업을 반복하면, 모든 수를 1로 만들 수 있다는 추측입니다. 작업은 다음과 같습니다.
+## 🔒 문제 : String형 배열 seoul의 element중 "Kim"의 위치 x를 찾아, "김서방은 x에 있다"는 String을 반환하는 함수, solution을 완성하세요. seoul에 "Kim"은 오직 한 번만 나타나며 잘못된 값이 입력되는 경우는 없습니다.
 
-- 1-1. 입력된 수가 짝수라면 2로 나눕니다. 
-- 1-2. 입력된 수가 홀수라면 3을 곱하고 1을 더합니다. 
-- 2. 결과로 나온 수에 같은 작업을 1이 될 때까지 반복합니다. 예를 들어, 주어진 수가 6이라면 6 → 3 → 10 → 5 → 16 → 8 → 4 → 2 → 1 이 되어 총 8번 만에 1이 됩니다. 위 작업을 몇 번이나 반복해야 하는지 반환하는 함수, solution을 완성해 주세요. 단, 주어진 수가 1인 경우에는 0을, 작업을 500번 반복할 때까지 1이 되지 않는다면 –1을 반환해 주세요.
-
-## 🚫 조건 : 입력된 수, num은 1 이상 8,000,000 미만인 정수입니다.
-
+## 🚫 조건 : 
+- seoul은 길이 1 이상, 1000 이하인 배열입니다.
+- seoul의 원소는 길이 1 이상, 20 이하인 문자열입니다.
+- "Kim"은 반드시 seoul 안에 포함되어 있습니다.
 
 # 💡 필요했던 메서드
-**없음**
+- format() : 리턴되는 문자열의 형태를 지정하는 메소드
+- equals() : 문자열 값 비교
 
 # 🔓 문제풀이
 ```java
+
 class Solution {
-    public int solution(int num) {
-        int answer = 0;
-        
-        while(num!=1) {
-            
-            if (num % 2 == 0) {
-                num = num / 2;
-            } else if (num % 2 == 1) {
-                num = (num * 3) +1;
+    public String solution(String[] seoul) {
+        String answer = "Kim";
+        int x = 0;
+        for(int i=0; i<seoul.length; i++) {
+            if (seoul[i].equals(answer)){
+                x = i;
             }
-            answer++;
-            
-            if (answer == 500) {
-                answer = -1;
-                return answer;
-             }
-        } 
-        return answer; 
-    }              
-}
+        }
+        return String.format("김서방은 %d에 있다", x);
+    }
+}              
+
 ```
 
 ## 🤷‍♀️ 코딩테스트 1 문제풀이를 하면서 느낀점
-: 마지막 3번째 테스트에서 통과를 못해서 고민을 많이 했는데,
-while의 조건을 answer <=500 으로 잡고 있어서 -1이 반환되야 할 상황에서는
-어디서 return문을 넣어야 할지 막막해지면서 조건문이 잘못되었다라는 것을 인지했다.
-조건을 num !=1로 바꾸면서 while안의 블록에서 처리해야 할 방법에 대해서 풀렸던 것 같다.
-정말 간단한 문제 같은데.. 1시간이 걸렸다.. 후우.. 풀리니까 재밌는 코딩테스트인데..
-안풀리면 내가 멍청이 같아보여서 묘한 매력이 있다..😁
+: 반환타입이 String인데 계속 index를 반환하려고 했던 나의 조급함.. 
+그리고 처음부터 indexOf를 배열에서 잘 활용하지 못해 아쉽다..
+Arrays.asList()는 배열을 리스트형식으로 변환해준다는 것을 꼭 기억했다가 다음번에 
+비슷한 문제를 만나면 활용할 것 ! 
 
 ## 🎈 코딩테스트 1 다른사람의 풀이! 
 
 ```java
-class Collatz {
-    public int collatz(int num) {
-    long n = (long)num;
-    for(int i=0; i<500; i++){
-        if(n==1) return i; 
-      n = (n%2==0) ? n/2 : n*3+1;
+import java.util.Arrays;
+public class FindKim {
+    public String findKim(String[] seoul){
+        //x에 김서방의 위치를 저장하세요.
+        int x = Arrays.asList(seoul).indexOf("Kim");        
+        return "김서방은 "+ x + "에 있다";
     }
-        return -1;
-    }
+}
 ```
+- asList() : 배열을 - 리스트로 변환
+- indexOf() : 해당 문자열 인덱스번호 찾기 
 
-TMI) 삼항연산자는 정말 쉬운 듯 한데 응용이 안된다.. 하하하하하하핳 🤣
-오늘은 과제를 제출해야 하므로 1문제로 족하자..ㅠ_ㅠ...
+
 
 --------------------------------------------------------------
 

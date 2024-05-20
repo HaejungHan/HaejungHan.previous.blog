@@ -1,30 +1,150 @@
 ---
 layout: post
-title:  "TIL(20240515) JAVA: ; Spring; 코딩테스트: 두 정수의 합, 문자 리스트를 문자열로 변환하기;"
+title:  "TIL(20240515) JAVA:StringBuilder와StringBuffer 그리고 Math클래스 ; Spring; 코딩테스트: 두 정수의 합, 문자 리스트를 문자열로 변환하기;"
 date:  2024-05-15
 categories: TIL JAVA Spring 코딩테스트
 ---
 
 ---------------------------------------------------------------------
 
-- 나는 왜 이렇게 코드를 작성했는가?
-- 
-- 나는 왜 이 기술을 사용했는가?
 
 ## 🙌 오늘의 공부목록
-- Spring 2주차 강의 듣기 
-- Spring 개인과제 필수기능구현까지 해보기
+- ~~Spring 2주차 강의 듣기~~ 
+- ~~Spring 개인과제 필수기능구현까지 해보기~~
 - JAVA chapter 9 강의듣기
-- JAVA 강의듣고 정리하기
-
-## 🔄 내일의 공부목록
-
-### ✔ 오늘 하루 느낀점
+- ~~JAVA 강의듣고 정리하기~~
+- ~~코딩테스트 문제풀기~~
 
 ---
 
 # 📌 JAVA    
 
+### ✨ 들어가기전 : StringBuilder와 StringBuffer는 문자열을 수정할 수 있는 객체!
+
+## 💡 StringBuilder
+- 싱글 쓰레드로 작성된 것(1개당 하나의 작업)
+
+```java
+
+// 메서드 사용 시 공백도 인덱스번호에 포함되므로 주의할 것!
+StringBuilder sb = new StringBuilder();
+
+        // append
+        sb.append("Hello Java!");
+        System.out.println("append : "+ sb); // Hello Java!
+
+        // insert(인덱스번호, "삽입문자")
+        sb.insert(5, "!!!"); // Hello!!! Java!
+        System.out.println("insert : " + sb);
+
+        // replace(인덱스번호1,인덱스번호2, "대체문자")
+        sb.replace(0,8, "I love");
+        System.out.println("replace : " + sb); // I love Java!
+
+        // delete(인덱스번호1,인덱스번호2)
+        sb.delete(0,6); 
+        System.out.println("delete : " + sb); // Java!
+
+        // reverse 
+        sb.reverse();
+        System.out.println("reverse : " + sb); // !avaJ
+        
+        sb.reverse();
+        sb.insert(6, " developer");  
+        System.out.println("insert2 : " + sb); // Java! developer
+
+        // setLength (길이를 줄이면 그 뒤의 문자들은 제거됨)
+        sb.setLength(5);
+        System.out.println("setLength : " + sb); // Java
+
+        // charAt 특정인덱스 문자 가져오기
+        char ch = sb.charAt(1);
+        System.out.println("charAt : " + ch); // J
+
+        // setCharAt (특정 인덱스 문자설정하기)
+        sb.setCharAt(1,'j'); 
+        System.out.println("setcharAt : " + sb); // java
+        
+        // substring
+        String substring = sb.substring(1,3);  
+        System.out.println("substring : " + substring);  // ja 
+```
+
+## 💡 StringBuffer
+- 멀티 쓰레드로 작성된 것(동시에 여러 작업)
+- 동기화되어 있으나 멀티쓰레드 프로그램이 아닌 경우에 buffer사용할 경우 성능저하
+
+## 💡 Math클래스
+- 수학관련 static 메서드의 집합
+- round() : 원하는 소수점 아래 첫 번째 자리에서 반올림하기
+
+```java
+
+   double d = 90.7552;
+        System.out.println(d *=100); // 9075.52
+        System.out.println((double)Math.round(d)); // 9076
+
+```
+### 💡 Math클래스의 메서드
+
+- abs() : 주어진 절대값을 반환함 (양수->양수, 음수->양수)
+- double ceil() : 주어진 값을 올림하여 반환 (음수는 주의할 것 - 음수에서 큰 숫자는 반대..)
+- double floor() : 주어진 값을 버림하여 반환 (음수 주의 - 음수에서 작은 숫자)
+- max(a,b) : 주어진 두 값을 비교하여 큰 쪽을 반환함
+- min(a,b) : 주어진 두 값을 비교하여 작은 쪽을 반환함 
+- double random() : 0~1범위의 값을 반환함 0<x<1 (1은 미포함)
+- round() : 소수점 첫째자리 반올림 
+
+```java
+
+// Math.abs()
+        double d1 = 11.0;
+        double d2 = -11.0;
+        System.out.println(Math.abs(d1)); // 11.0
+        System.out.println(Math.abs(d2)); // 11.0
+
+// Math.ceil() 올림하여 큰 수 반환
+        double d3 = 11.3; 
+        double d4 = -11.3;
+        System.out.println(Math.ceil(d3)); // 12.0;
+        System.out.println(Math.ceil(d4)); // -11.0; 더 큰 수 반환 음수에서는 -11.3보다 -11.0이 더 큼...
+
+// Math.floor() 버림하여 작은 수 반환
+        System.out.println(Math.floor(d3)); // 11.0;
+        System.out.println(Math.floor(d4)); // -12.0; // 더 작은 수 반환 음수에서는 -11.3보다 -12.0이 더 작음.. 
+
+// Math.max()
+        int num = Math.max(2,8);
+        System.out.println("num의 더 큰 값은 : " + num); // 8
+        double d = Math.max(1.4, 0.9);
+        System.out.println("d의 더 큰 값은 : "+ d); // 1.4
+        
+// Math.min()
+        int num1 = Math.min(2,8);
+        double d1 = Math.min(1.4, 0.9);
+        System.out.println("num1의 더 작은 값은 : "+ num1); // 2
+        System.out.println("d1의 더 작은 갑은: "+ d1); // 0.9
+
+// Math.random
+        double d = Math.random();
+        System.out.println(d); // 0.0< d < 1.0사이의 수 중 random
+
+// 로또번호 뽑기
+        
+        Set<Integer> roto = new HashSet<Integer>();
+        
+        for(int i=0; roto.size()<6; i++){
+            int num = (int)(Math.random() * 45) + 1; // 1 <= num < 46
+            roto.add(num);
+        }
+
+        System.out.println(roto.toString());  // [16, 37, 6, 24, 10, 27] 랜덤 숫자 6개     
+
+// Math.round
+        double d = 88.767;
+        System.out.println(Math.round(d)); // 89
+
+```
 
 ---------------------------------------------------------------------
 
@@ -35,7 +155,7 @@ categories: TIL JAVA Spring 코딩테스트
 ## 💡 DB 선택 -> 테이블 조회
 
 ```
-//client
+//mysql - client
 show tables;
 show databases;
 
