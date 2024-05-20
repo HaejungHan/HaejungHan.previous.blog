@@ -33,6 +33,7 @@ categories: TIL JAVA Spring 코딩테스트
 
 # 📌 MySQL
 ## 💡 DB 선택 -> 테이블 조회
+
 ```
 //client
 show tables;
@@ -49,8 +50,8 @@ select * from 데이터베이스명;
 ```java
 My SQL error1 : Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed: org.springframework.jdbc.BadSqlGrammarException: StatementCallback; bad SQL grammar [SELECT * FROM memo]] with root cause
 
-
 ```
+
 https://velog.io/@hyeddo/MySQL-%EC%99%84%EC%A0%84-%EC%82%AD%EC%A0%9C-%ED%9B%84-%EC%9E%AC%EC%84%A4%EC%B9%98%ED%95%98%EA%B8%B0
 
 winver
@@ -70,6 +71,7 @@ winver
 **없음**
 
 # 🔓 문제풀이
+
 ```java
 class Solution {
     public long solution(int a, int b) {
@@ -98,6 +100,7 @@ class Solution {
 Math.min()/Math.max() 머리 속에 킵...!
 
 ## 🎈 코딩테스트 1 다른사람의 풀이! 
+
 ```java
 class Solution {
   public long solution(int a, int b) {
@@ -114,6 +117,7 @@ class Solution {
   }
 }
 ```
+
 - 메서드 :
 1) Math.min(a, b); -> 두 인자 값 중 가장 작은 값을 리턴 
 2) Math.max(a, b); -> 두 인자 값 중 가장 큰 값을 리턴
@@ -131,6 +135,7 @@ class Solution {
 
 
 # 🔓 문제풀이
+
 ```java
 class Solution {
     public String solution(String[] arr) {
@@ -142,6 +147,7 @@ class Solution {
     }
 }
 ```
+
 ## 🎈 코딩테스트 2 다른사람의 풀이! 
 - StringBuffer는 멀티 스레드 환경에서 안전하고, StringBuilder는 StringBuffer보다 성능이 우수하다는 장점이 있다. 따라서 동기화를 고려할 필요가 없는 상황에서는 StringBuffer보다 StringBuilder를 사용하는 것이 유리하다.
 - StringBuilder는 변경 가능한 문자열을 만들어 주기 때문에, String을 합치는 작업 시 하나의 대안이 될 수 있다.

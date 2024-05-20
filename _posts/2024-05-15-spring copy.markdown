@@ -53,6 +53,7 @@ categories: TIL JAVA Spring 코딩테스트
 - ClasCastException : 형변환 잘못됨
 - IndexOutBoundException : 배열범위 벗어날 경우
 - NullPointException : 
+
 ```java
 // NullPointException 예시
 String str = null;
@@ -73,6 +74,7 @@ System.out.println(String.valueOf(i));
 ### 논리적에러 : 작성 의도와 다르게 동작 (프로그램 종료X)
 
 ## 💡 예외 처리하기 - try-catch문
+
 ```java
 // 사용방법 
 try {
@@ -84,6 +86,7 @@ try {
 } ...
 ```
 ### 👀 이해하기 위한 예제(코드 따라서 작성하기)
+
 ```java
 class Main {
     public static void main (String[] args){
@@ -103,14 +106,17 @@ class Main {
     }   
 }
 ```
+
 ```
 // 출력 : 1 , 2 , ArithmeticException , 4 , 5
 ```
+
 🎈 Exception은 가장 마지막 catch문에서 사용해야한다. 다른 예외사항에 해당하지 않을 경우 Exception에서 모든 예외사항을 처리하기 때문에!
 
 ## 💡 printStackTrac()와 getMessage()
 - printStackTrac() : 예외발생 당시의 호출스택(Call Stack)에 있었던 메서드의 정보와 예외메세지를 화면에 출력한다.
 - getMessage() : 발생한 예외클래스의 인스턴스에 저장된 메세지를 얻을 수 있다.
+
 ```java
 class Main {
     public static void main (String[] args){
@@ -131,6 +137,7 @@ class Main {
 
 ## 💡 멀티 catch블럭
 - 내용이 같은 catch블럭을 하나로 합친 것
+
 ```java
 try{
 
@@ -147,11 +154,13 @@ try{
     e.printStackTrace();
 }
 ```
+
 ※ 주의사항 : 
 1) 부모자식관계의 Exception 클래스 사용X
 2) ExceptionA와 ExceptionB의 객체의 공통된 메서드만 사용가능(필요할 경우 형변환해서 사용가능)
 
 ## 💡 예외 발생시키기
+
 ```java
 class Main {
     public static void main (String[] args){
@@ -168,6 +177,7 @@ class Main {
 
 ## 💡 메서드 예외 선언하기
 - 예외를 처리하는 방법 : try-catch문(직접처리), 예외 선언하기(예외 떠넘기기), (은폐..)덮기
+
 ```java
 // 예외 떠넘기기
 class Main {
@@ -211,12 +221,14 @@ class Main {
 }
 
 ```
+
 🎈 상황에 맞게 판단하여 사용하자!
 - 예외가 발생한 곳에서 예외를 처리하거나 (직접처리)
 - 메서드를 호출한 곳에서 예외처리하거나 (떠넘기기)
 
 ## 💡 finally 블럭
 - 예외 발생여부와 관계없이 수행되어야 하는 코드를 넣는다. 
+
 ```java
 class Main { 
     public static void main (String[] args){
@@ -238,12 +250,12 @@ class Main {
         return f;
     }
 }
-
 ```
 
 ## 💡 사용자 정의 예외 만들기
 - 직접 예외 클래스를 정의할 수 있다.
 - Exception과 RuntimeException중에서 선택
+
 ```java
 //사용방법
 clas MyException extends Exception {
@@ -255,6 +267,7 @@ clas MyException extends Exception {
 
 ## 💡 예외 되던지기 (Exception re-throwing)
 - 예외를 처리한 후에 다시 예외를 발생시키는 것
+
 ```java
 class Main {
     public static void main (String[] args){
@@ -276,6 +289,7 @@ class Main {
     }
 }
 ```
+
 🎈 팀프로젝트를 하면서 이런 경우가 있었는데, somethingToDo같은 메서드는 B클래스에서 
 1차적으로 RuntimeException으로 걸러주고, 혹시나 다른 예외가 발생시에는 Main클래스에서
 2차적으로 Exception으로 걸러주게 처리했던 적이 있다! 이런 형식으로 사용하면 되는 게 아닐까.. 생각이 든다. 
@@ -283,6 +297,7 @@ class Main {
 ## 💡 연결된 예외(chained exception)
 - 어떤 경우에 사용되는가? 
 1) 여러 예외를 하나로 묶어서 다루기 위해(너무 많은 catch블럭이 생길때 유용)
+
 ```java
 // 설치 중에 발생할 예외들이 너무 많을 경우
 try {
@@ -319,10 +334,12 @@ void install() throws InstallException {
     }
 }
 ```
+
 🎈 설치 중에 발생하는 예외들을 한 번에 묶어 처리할 수 있다.
 
 2) checked 예외를 unchecked 예외로 변경하려 할 때
 - 예를들어 "MemoryException m"을 선택예외로 변경하고 싶을 때
+
 ```java
 static void startInstall() throws SpaceException, MemoryException {
     if (!enoughSpace()) {
@@ -346,6 +363,7 @@ static void startInstall() throws SpaceException { // 필수예외만 throws
 }
 
 ```
+
 🎈 필수 예외를 선택 예외로 바꿀 수 있다.
 ---------------------------------------------------------------------
 
@@ -372,6 +390,7 @@ My SQL error 1: Access denied for user ''@'localhost' (using password: YES)
 - .substring(index,index) -> 문자열 자르기 
 
 # 🔓 문제풀이
+
 ```java
 class Solution {
     public boolean solution(int x) {
@@ -444,6 +463,7 @@ String.valueOf 값을 잘 반환하지만 Integer.toString은 NullpointException
 
 
 # 🔓 문제풀이
+
 ```java
 class Solution {
     public int solution(int[] dot) {
