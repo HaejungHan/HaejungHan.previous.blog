@@ -1,7 +1,7 @@
 ---
 layout: post
-title:  "TIL(20240520) JAVA: 제네릭; Spring; 코딩테스트: 서울에서 김서방 찾기;"
-date:  2024-05-20
+title:  "TIL(20240521) JAVA: 제네릭; Spring; 코딩테스트:나누어 떨어지는 숫자 배열;"
+date:  2024-05-21
 categories: TIL JAVA Spring 코딩테스트
 ---
 
@@ -17,217 +17,99 @@ categories: TIL JAVA Spring 코딩테스트
 
 # 📌 JAVA  
 
-## 💡 제네릭스(Generics)
-- 컴파일시 타입을 체크해 주는 기능, 다양한 데이터 타입을 처리할 수 있도록 하는 기능
-- 제네릭을 사용하면 타입 안정성과 코드 재사용성을 높일 수 있음-> 객체 타입의 안정성을 높이고, 형변환의 번거로움을 줄여줌
-
-![제네릭](https://user-images.githubusercontent.com/33862991/109501510-07125300-7adb-11eb-9d55-7d9efb2ff2d0.png)
-
-- 형변환 에러 : ClassCastException
-
-## 💡 제네릭 타입과 다형성
-- 참조변수와 생성자의 대입된 타입은 일치해야 한다.
-
-```java
-ArrayList<Person> list = new ArrayList<Person>(); // 가능 대입된 타입 일치
-ArrayList<Person> list = new ArrayList<Box>(); // error 대입된 타입 불일치
-```
-
-- 제네릭 클래스간의 다형성은 성립 (대입된 타입은 일치해야함)
-
-```java
-List<Person> list = new ArrayList<Person>(); // 가능, 다형성 ArrayList가 List를 구현
-List<Person> list = new LinkedList<Person>(); // 가능, 다형성 LinkedList가 List를 구현
-```
-
--  매개변수의 다형성도 성립 
-
-```java
-class Product{}
-class Tv extends Product{}
-class Audio extends Product{}
-
-        ArrayList<Product> list = new ArrayList<Product>(); 
-        list.add(new Product()); // 가능
-        list.add(new Tv()); // 가능 
-        list.add(new Audio()); // 가능
-        printAll(list);  // Product@3fee733d Tv@5acf9800 Audio@4617c264
-
-        
-    public static void printAll(ArrayList<Product> list)
-            for(Product p : list) {
-                System.out.println(p);
-            }
-```
-
-```java
- ArrayList<Integer> list = new ArrayList<Integer>();
-
-        list.add(12); // 오토박싱
-        list.add(13);
-        
-//        list.add("14"); // error String 타입 불가
-
-        System.out.println(list); // [12, 13]
-```
-
-### 🎈 String 타입을 넣으려면?
-
-```java
-    ArrayList<Object> list = new ArrayList<Object>(); // Object타입으로 변환
-
-        list.add(12); // 오토박싱
-        list.add(13);       
-        list.add("14"); 
-
-        String str = (String)list.get(2);
-        System.out.println(str); // 14
-```
-
-### 👀 예제 만들어서 이해하기
-
-
-```java
-class Person {
-    private String name;
-    private int age;
-
-    public Person (String name, int age) {
-        this.name = name;
-        this.age = age;
-    }
-
-    public String toString() {
-        return "나의 이름은 "+name+ " 나이는 "+age+" 입니다";
-    } 
-}
-class Main {
-    public static void main(String[] args) {
-    ArrayList<Person> list = new ArrayList<Person>();
-        Person person = new Person("hanni", 33);
-        list.add(person);
-        System.out.println(list.get(0));
-        
-    }
-}
-```
-
-```java
-class Box<T> {
-    private T contents;
-
-    public void setContents(T contents) {
-        this.contents = contents;
-    }
-    public T getContents() {
-        return contents;
-    }
-
-    public void displayContents() {
-        System.out.println("contents :"+ contents);
-    }
-}
-
-class Person {
-    private String name;
-    private int age;
-
-    public Person(String name, int age) {
-        this.name = name;
-        this.age = age;
-    }
-
-    public String toString(){
-        return "사람의 이름은 : "+name+" 나이는 : "+age+" 입니다";
-    }
-}
-class Main {
-    public static void main(String[] args) {
-    // 정수형 box 생성
-        Box<Integer> integerBox = new Box();
-        integerBox.setContents(100);
-        integerBox.displayContents(); // contents :100
-
-    // 문자열형 box생성
-        Box<String> stringBox = new Box();
-        stringBox.setContents("apple");
-        stringBox.displayContents(); // contents :apple
-
-    // 사용자 정의 타입 Box 생성
-        Box<Person> person = new Box();
-        person.setContents(new Person("hanni", 33));
-        person.displayContents(); // contents :사람의 이름은 : hanni 나이는 : 33 입니다
-
-        
-        
-    }
-}
-```
-
-
 ---------------------------------------------------------------------
 
 
 # 📌 Spring
-- gradle이란? 버전을 설정하고 라이브러리를 가져오는 것 !
+
+## 💡인증과 인가
+- 인증(Authentication)
+1) 인증은 해당 유저가 실제 유저인지 인증하는 개념
+2) 실제 유저가 맞는지 확인하는 절차
+- 인가(Authorization)
+1) 인가는 해당 유저가 특정 리소스에 접근이 가능한지 허가를 확인하는 개념
+ex) 유저-마이페이지, 관리자페이지- 관리자권한
+
+## 💡인증 방식
+1) 쿠키-세션 방식의 인증
+- 쿠키-세션 방식은 서버가 '특정 유저가 로그인 되었다'는 상태를 저장하는 방식이다.
+인증과 관련된 아주 약간의 정보만 서버가 가지고 있게 되고 유저의 이전상태의 전부는 아니더라도
+인증과 관련된 최소한 정보는 저장해서 로그인을 유지시킨다는 개념이다.
+- JWT와 차이점: 세션저장소 세션생성 후 쿠키검증
+2) JWT기반 인증
+- JWT(JSON Web Token)란 인증에 필요한 정보를 암호화시킨 토큰을 의미한다. JWT인증은 쿠키/세션과 유사하게 JWT토큰을 HTTP헤더에 실어 서버가 클라이언트를 식별한다.
+- 쿠키-세션 방식과 차이점: DB에서 회원확인 후 ACCESS 토근 발급해 바로 검증
+
+## 💡 쿠키와 세션
+- 쿠키와 세션 모두 HTTP에 상태 정보를 유지하기 위해 사용된다. 즉, 쿠키와 세션을 통해 서버에서는 클라이언트별로 인증 및 인가를 할 수 있게 된다.
+
+1. 쿠키 : 클라이언트에 저장될 목적으로 생성한 작은 정보를 담은 파일
+2. 세션  
+1) 서버에서 일정시간 동안 클라이언트 상태를 유지하기 위해 사용됨
+2) 서버에서 클라이언트별로 유일무이한 '세션ID'를 부여한 후 클라이언트별 필요한 정보를 서버에 저장함
+3) 서버에서 생성한 '세션ID'는 클라이언트의 쿠키값('세션쿠키'라고 부름)으로 저장되어 클라이언트 식별에 사용됨
 
 # 📌 MySQL
 
 
 ---------------------------------------------------------------------
 
-# 📌 코딩테스트 : 서울에서 김서방 찾기
+# 📌 코딩테스트 : 나누어 떨어지는 숫자 배열
 
-## 🔒 문제 : String형 배열 seoul의 element중 "Kim"의 위치 x를 찾아, "김서방은 x에 있다"는 String을 반환하는 함수, solution을 완성하세요. seoul에 "Kim"은 오직 한 번만 나타나며 잘못된 값이 입력되는 경우는 없습니다.
+## 🔒 문제 : array의 각 element 중 divisor로 나누어 떨어지는 값을 오름차순으로 정렬한 배열을 반환하는 함수, solution을 작성해주세요. divisor로 나누어 떨어지는 element가 하나도 없다면 배열에 -1을 담아 반환하세요.
 
 ## 🚫 조건 : 
-- seoul은 길이 1 이상, 1000 이하인 배열입니다.
-- seoul의 원소는 길이 1 이상, 20 이하인 문자열입니다.
-- "Kim"은 반드시 seoul 안에 포함되어 있습니다.
+- arr은 자연수를 담은 배열입니다.
+- 정수 i, j에 대해 i ≠ j 이면 arr[i] ≠ arr[j] 입니다.
+- divisor는 자연수입니다.
+- array는 길이 1 이상인 배열입니다.
 
 # 💡 필요했던 메서드
-- format() : 리턴되는 문자열의 형태를 지정하는 메소드
-- equals() : 문자열 값 비교
+- Arrays.sort() : 오름차순 정렬
+
 
 # 🔓 문제풀이
 ```java
 
+import java.util.Arrays;
+import java.util.ArrayList;
+
 class Solution {
-    public String solution(String[] seoul) {
-        String answer = "Kim";
-        int x = 0;
-        for(int i=0; i<seoul.length; i++) {
-            if (seoul[i].equals(answer)){
-                x = i;
+    public int[] solution(int[] arr, int divisor) {
+        int[] answer = {};
+        
+        ArrayList<Integer> list = new ArrayList<Integer>();
+        
+        for(int i=0; i<arr.length; i++){
+            if(arr[i]%divisor == 0) {
+                list.add(arr[i]);
+            } 
+            if (list.size() == 0){
+                answer = new int[]{-1};
+            } else {
+                answer = new int[list.size()];
+                for (int j=0; j<list.size(); j++){
+                    answer[j] = list.get(j);
+                }
+                Arrays.sort(answer);
             }
+            
         }
-        return String.format("김서방은 %d에 있다", x);
+        return answer;
     }
-}              
+}
 
 ```
 
 ## 🤷‍♀️ 코딩테스트 1 문제풀이를 하면서 느낀점
-: 반환타입이 String인데 계속 index를 반환하려고 했던 나의 조급함.. 
-그리고 처음부터 indexOf를 배열에서 잘 활용하지 못해 아쉽다..
-Arrays.asList()는 배열을 리스트형식으로 변환해준다는 것을 꼭 기억했다가 다음번에 
-비슷한 문제를 만나면 활용할 것 ! 
+: 처음 생각한건 int[] answer 배열은 변경 불가능하기에 값을 필터링한 후 값을 넣어줄 수 있는 임시 저장소가 필요하다고 생각했다.    
+그래서 생각한 건 ArrayList(변경가능한 객체)를 생성하여 임시로 answer의 값들을 list(참조변수)에 넣어두고 다시 answer배열에 옮겨야 겠다는 생각이 들었다.
+배열과 컬렉션에서는 배열의 길이 length/ 배열의 크기 size가 다르니 주의하자. 
+
 
 ## 🎈 코딩테스트 1 다른사람의 풀이! 
-
-```java
-import java.util.Arrays;
-public class FindKim {
-    public String findKim(String[] seoul){
-        //x에 김서방의 위치를 저장하세요.
-        int x = Arrays.asList(seoul).indexOf("Kim");        
-        return "김서방은 "+ x + "에 있다";
-    }
-}
-```
-- asList() : 배열을 - 리스트로 변환
-- indexOf() : 해당 문자열 인덱스번호 찾기 
+- 다른사람의 풀이를 보니 stream으로 문제를 풀었던 것 같다. 아직 나는 stream이 뭔지 제대로 알지도 못하니 공부를 하고 참고하자 생각해서
+이번에는 다른사람의 풀이를 보지 않았다. 
 
 
 --------------------------------------------------------------
-
