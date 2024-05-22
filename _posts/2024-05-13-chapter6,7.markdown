@@ -1,8 +1,8 @@
 ---
 layout: post
-title:  "TIL(20240513) JAVA Spring 코딩테스트 : 정수 내림차순으로 배치하기"
+title:  "TIL(20240513) 코딩테스트:정수 내림차순으로 배치하기"
 date:  2024-05-13 
-categories: TIL JAVA Spring 코딩테스트
+categories: TIL 코딩테스트
 ---
 
 ---------------------------------------------------------------------
@@ -21,11 +21,6 @@ categories: TIL JAVA Spring 코딩테스트
 - Spring 강의 1주차 끝내기!!!!!
 - Spring 강의 2주차 - 8까지는 꼭 끝내기
 - Spring 강의 1주차 강의 정리!!!
-
----
-
-# 📌 JAVA    
-
 
 
 ---------------------------------------------------------------------
@@ -47,6 +42,7 @@ categories: TIL JAVA Spring 코딩테스트
 5. String.valueOf() : String타입으로 변환
 
 # 🔓 문제풀이
+
 ```java
 import java.util.*;
 
