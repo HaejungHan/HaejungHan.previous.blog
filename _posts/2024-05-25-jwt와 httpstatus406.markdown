@@ -2,7 +2,7 @@
 layout: post
 title:  "TIL(20240525) Spring:JWT/HttpStatus:406;"
 date:  2024-05-25
-categories: TIL JAVA 코딩테스트
+categories: TIL Spring
 ---
 
 ---------------------------------------------------------------------

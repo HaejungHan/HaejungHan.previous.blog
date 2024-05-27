@@ -2,7 +2,7 @@
 layout: post
 title:  "TIL(20240522) Spring:트랜잭션; DB:기본키(PK)와 외래키(FK); 코딩테스트:음양 더하기;"
 date:  2024-05-22
-categories: TIL DB 코딩테스트
+categories: TIL DB Spring 코딩테스트
 ---
 
 ---------------------------------------------------------------------
