@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "TIL(20240528) 코딩테스트:가운데 글자 가져오기;"
+title:  "TIL(20240528) StatusCode: 4XX | 코딩테스트:가운데 글자 가져오기"
 date:  2024-05-28
 categories: TIL Spring 코딩테스트
 ---
