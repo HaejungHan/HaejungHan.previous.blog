@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "TIL(20240529) [Spring:AccessToken과 RefreshTocken][코딩테스트]"
+title:  "TIL(20240529) [Spring:AccessToken과 RefreshTocken][코딩테스트:수박수]"
 date:  2024-05-29
 categories: TIL Spring 코딩테스트
 ---
@@ -20,6 +20,7 @@ categories: TIL Spring 코딩테스트
 - RefreshToken은 엑세스 토큰이 만료되었을 때 서버에서 확인하여 새로운 AccessToken을 발급해주기 위해 사용한다.
 
 ## 여기서 잠깐! 그럼 쿠키-세션방식 말고 구지 JWT방식을 사용하는가?
+
 ### 🚩 Stateful과 Stateless
 #### 💡 stateful: 상태유지로, 세션과 같은 형식을 말하여 클라이언트의 상태를 서버가 저장하고 있다. 쉽게 말해, 사용자가 로그인 한 후에 다른 홈페이지로 갔다가 돌아와도 로그인 상태를 유지하고 있는 것을 의미한다. 
 #### 💡 stateless:  무상태로 클라이언트의 상태를 보존하고 있지 않는 상태로 서버는 단순히 요청이 오면 응답만 보내는 역할만 수행하게 된다. 즉, 클라이언트와 서버간의 통신에 필요한 모든 상태정보들은 클라이언트에서 가지고 있다가 서버와 통신할 때 데이터를 실어 보내는 구조이다. 
