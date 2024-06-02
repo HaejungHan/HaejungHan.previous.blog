@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "TIL(20240602) Spring: SQL/IoC와 DI/Bean 키워드 정리"
+title:  "TIL(20240602) [Spring:DDL,DCL,DML/IoC와 DI/ Bean]"
 date:  2024-06-02
 categories: TIL Spring
 ---
@@ -180,9 +180,4 @@ class Pizza implements Food{
 - Jpa는 표준 명세, 이를 실제로 구현한 프레임워크 중 사실상 표준이 하이버네이트(Hibernate) 이다. 
 
 
-
-
-
-
-
-
+---------------------------------------------------------------------
