@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "TIL(20240514) JAVA:익명클래스; Spring:Error; "
+title:  "TIL(20240514) JAVA: 익명클래스"
 date:  2024-05-14
 categories: TIL JAVA Spring
 ---

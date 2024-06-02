@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "TIL(20240515) JAVA:StringBuilder/StringBuffer,Math클래스; MySQL; 코딩테스트: 두 정수의 합, 문자 리스트를 문자열로 변환하기;"
+title:  "TIL(20240515) [JAVA:StringBuilder/StringBuffer,Math클래스]"
 date:  2024-05-15
 categories: TIL JAVA MySQL 코딩테스트
 ---

@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "TIL(20240523) JAVA: String클래스; 코딩테스트:핸드폰 번호 가리기;"
+title:  "TIL(20240523) [JAVA: String클래스]"
 date:  2024-05-23
 categories: TIL JAVA 코딩테스트
 ---

@@ -1,14 +1,15 @@
 ---
 layout: post
-title:  "TIL(20240525) Spring:JWT/HttpStatus:406;"
+title:  "TIL(20240525) [Spring:JWT/HttpStatus:406]"
 date:  2024-05-25
-categories: TIL Spring
+categories: TIL Spring DB 코딩테스트
 ---
 
 ---------------------------------------------------------------------
 
+# 📌 Spring
 
-# 💡 Spring 댓글 기능 구현 1) 댓글 등록
+## 💡 Spring 댓글 기능 구현 1) 댓글 등록
 
 ## 🔒 HttpStatus: 406
 :  HTTP (HyperText Transfer Protocol) 406 Not Acceptable 클라이언트 오류 응답 코드는 서버가 요청의 사전 콘텐츠 협상 헤더에 정의 된 허용 가능한 값 목록과 일치하는 응답을 생성 할 수 없으며 서버가 기본 표현을 제공하지 않음을 나타냅니다.
@@ -110,8 +111,6 @@ encodedPassword : 암호화되어 DB에 저장된 비밀번호
 - 절차적인 프로그램 어떻게 보완한 페러다임 ? 
 
 서로 대화하는 형식.. 티키타카의 형식으로!  
-
-# 📌 Spring
 
 # 📌 DB
 

@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "TIL(20240529) [Spring:AccessToken과 RefreshTocken][코딩테스트:수박수]"
+title:  "TIL(20240529) [Spring:AccessToken과 RefreshTocken]"
 date:  2024-05-29
 categories: TIL Spring 코딩테스트
 ---
