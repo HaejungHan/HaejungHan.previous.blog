@@ -43,6 +43,10 @@ Controller의 경우 html을 반환, RestController는 Json형태로 데이터�
 3) UPDATE : 테이블의 row의 내용을 수정
 4) DELETE : 테이블의 row를 삭제
 
+</br>
+
+</br>
+
 ## 💡 Spring 기본2주차 복습 키워드 정리
 
 - 3 Layer Architecture 
@@ -119,7 +123,7 @@ class Pizza implements Food{
 치킨이나 피자를 요리할 수 있다. 그런데 여기서 살펴볼 점은 요리를 하는 제어권이 Cooker가 아닌 Food로 바뀐것을 볼 수 있다. 
 
 그렇다면 DI를 통해서 약한 결합을 하게 된다면 어떻게 될까? DI(의존성 주입)디자인 패턴의 경우에는 3가지  필드주입,setter주입,생성자 주입이 있다. 여기서 나는 **생성자 주입**으로 약한 결합의 경우를 살펴보도록 하겠다.
-(객체의 불변성을 위해 생성자 주입을 많이 사용한다고 한다.)
+(객체의 불변성을 위해 생성자 주입을 많이 사용한다.)
 
 ```java
 public class Cooker {
