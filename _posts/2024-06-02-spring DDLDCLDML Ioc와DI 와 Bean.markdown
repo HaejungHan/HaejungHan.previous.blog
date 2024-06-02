@@ -43,9 +43,6 @@ Controller의 경우 html을 반환, RestController는 Json형태로 데이터�
 3) UPDATE : 테이블의 row의 내용을 수정
 4) DELETE : 테이블의 row를 삭제
 
-</br>
-
-</br>
 
 ## 💡 Spring 기본2주차 복습 키워드 정리
 
