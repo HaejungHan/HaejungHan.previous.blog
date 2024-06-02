@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "TIL(20240602) Spring: 기본 주차 복습"
+title:  "TIL(20240602) Spring: SQL/IoC와 DI/Bean 키워드 정리"
 date:  2024-06-02
 categories: 
 ---
