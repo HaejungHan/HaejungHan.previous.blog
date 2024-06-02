@@ -13,7 +13,7 @@ sass:
   sass_dir: _sass
 plainwhite:
   name: Hanni
-  tagline: 우당탕! 좌충우돌 개발공부 일기
+  tagline: 좌충우돌 개발공부
   date_format: "%b %-d, %Y"
   sitemap: true # set to true to generate sitemap.xml content
   search: true # set to true to enable searchbar
