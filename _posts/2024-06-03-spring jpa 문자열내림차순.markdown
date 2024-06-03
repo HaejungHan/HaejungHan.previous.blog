@@ -34,6 +34,7 @@ SQL문의 DDL이나 DML의 수정작업이 필요하게 되는데 즉, 코드를
 ## 💡 Query Method 
 - 형식에 맞게 SQL 쿼리메서드를 선언하기만 하면 따로 구현하지 않아도 해당 메서드를 분석해서 (simple)JpaRepository가 대신 구현을 해주게 된다.
 - 예시) findAllByOrderByModifiedAtDesc() : modifiedAt 필드를 기준으로 정렬해서 해당 모든 데이터를 내보낼 건데 그 기준은 내림차순입니다.
+- 예시 2) findAllByContentsContainsOrderByModifiedAtDesc() : 해당 키워드 입력시 조회기능!
 
 <br>
 
