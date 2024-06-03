@@ -68,6 +68,9 @@ StringBuilder sb = new StringBuilder();
         // substring
         String substring = sb.substring(1,3);  
         System.out.println("substring : " + substring);  // ja 
+        
+        //정렬함수
+        .reverse().toString();
 ```
 
 ## 💡 StringBuffer

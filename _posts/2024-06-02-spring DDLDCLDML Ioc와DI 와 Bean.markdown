@@ -12,7 +12,7 @@ categories: TIL Spring
 오늘은 팀 프로젝트에 들어가기 앞서서 기본 1주차를 복습하기 위해
 핵심 키워드를 정리한다는 마음으로 공부를 하려고 한다. 
 
-## 💡 Spring 기본1주차 복습 키워드 정리
+## 💡 Spring 입문1주차 복습 키워드 정리
 
 - 정적페이지(static)와 동적페이지(templates)
 
@@ -44,7 +44,7 @@ Controller의 경우 html을 반환, RestController는 Json형태로 데이터�
 4) DELETE : 테이블의 row를 삭제
 
 
-## 💡 Spring 기본2주차 복습 키워드 정리
+## 💡 Spring 입문2주차 복습 키워드 정리
 
 - 3 Layer Architecture 
 1) Controller : client와 소통하는 창구 즉, 클라이언트의 요청을 받고 요청에 따른 로직처리를 service에게 넘기고 받은(결과) 해당 요청에 대한 응답을 client에게 반환하는 역할을 한다. 
