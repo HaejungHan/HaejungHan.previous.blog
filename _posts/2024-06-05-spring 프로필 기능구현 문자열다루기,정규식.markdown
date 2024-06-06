@@ -1,8 +1,8 @@
 ---
 layout: post
-title:  "TIL(20240605) [RegExp:정규표현식]"
+title:  "TIL(20240605) [뉴스피드프로젝트:프로필 기능구현,RegExp:정규표현식]"
 date:  2024-06-05
-categories: TIL Spring 코딩테스트 RegExp
+categories: TIL Spring 코딩테스트
 ---
 
 ---------------------------------------------------------------------
@@ -58,6 +58,13 @@ public class ProfileController {
 
     private final ProfileService profileService;
 
+    // 사용자의 프로필 조회
+    @GetMapping("/profile")
+    public ResponseEntity<ProfileResponseDto> getProfile(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        ProfileResponseDto responseDto = profileService.getProfile(userDetails.getUser());
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+    }
+
     // 사용자의 프로필 수정
     @PutMapping("/profile")
     public ResponseEntity<String> updateProfile(@RequestBody @Valid ProfileRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -76,6 +83,12 @@ public class ProfileService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder; 
 
+    // 사용자 프로필 조회
+    public ProfileResponseDto getProfile(User user) {
+        User currentUser = findById(user);
+        ProfileResponseDto responseDto = new ProfileResponseDto(user);
+        return responseDto;
+    }
 
     // 사용자 프로필 수정
     @Transactional
