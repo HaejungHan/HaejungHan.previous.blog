@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "TIL(20240606) [뉴스피드프로젝트:좋아요 기능구현,RegExp:정규표현식]"
+title:  "TIL(20240606) [뉴스피드프로젝트:좋아요 기능구현]"
 date:  2024-06-06
 categories: TIL Spring
 ---
