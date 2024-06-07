@@ -1,0 +1,59 @@
+---
+layout: post
+title:  "TIL(20240607) [Jpa:nullable=false와 @NotNull]"
+date:  2024-06-07
+categories: TIL Spring 코딩테스트
+---
+
+---------------------------------------------------------------------
+# 📌 Spring
+
+## 💡 뉴스피드 프로젝트 : 이메일 가입 및 인증 기능
+- 이메일 가입 시, **이메일 인증 기능**을 추가
+Step 1 : 사용자가 가입한 이메일 주소로 인증번호 발송<br>
+Step 2 : 발송한 인증번호와 입력란의 인증번호가 일치하는 지 확인<br>
+Step 3 : 이메일 인증이 완료되지 않은 회원들의 `회원상태코드`를 ‘인증 전’ 으로 설정<br>
+
+이메일 가입 및 인증기능을 구현하기 위해 이전에 프로필 부분을 수정해야 햇는데,
+프로필에서 이메일을 수정할 수 있는 기능이 있어서 이메일은 수정할 수 없도록 하고 유저 엔티티에서 이메일 부분을 @Notnull로 변경이 필요했다.
+
+그래서 컬럼에는 nullable=false라 되어 있는데, DB에서는 DDL생성 시 not null로 생성 되겠지만
+entity에서도 검증이 연결될까? 라는 의문이 생겼다. 그래서 찾아본 것이 컬럼에 nullable=false하지 않고 Validation- @NotNull로 해주면 자동으로 DDL생성 시 NotNull이 된다는 것을 알게되었다.
+
+
+[Jpa:nullable=false와 @NotNull](https://kafcamus.tistory.com/15)
+
+[Google Gmail SMTP 설정방법 및 메일 전송1](https://hyunmin1906.tistory.com/276)
+[Google Gmail SMTP 설정방법 및 메일 전송2](https://gwamssoju.tistory.com/108)
+
+---------------------------------------------------------------------
+
+# 📌 코딩테스트1️⃣ : 행렬의 덧셈
+
+### 🔒 문제 : 행렬의 덧셈은 행과 열의 크기가 같은 두 행렬의 같은 행, 같은 열의 값을 서로 더한 결과가 됩니다. 2개의 행렬 arr1과 arr2를 입력받아, 행렬 덧셈의 결과를 반환하는 함수, solution을 완성해주세요.
+
+### 🚫 조건 : 
+- 행렬 arr1, arr2의 행과 열의 길이는 500을 넘지 않습니다.
+
+
+## 🔓 문제풀이
+
+```java
+class Solution {
+    public int[][] solution(int[][] arr1, int[][] arr2) {
+        int[][] answer = {};
+        answer = new int[arr1.length][arr1[0].length]; // [세로][가로] 그리고 arr1[][] == arr2[][]
+        
+        for (int i=0; i<arr1.length; i++){ // 세로
+            for (int j=0; j<arr1[i].length; j++){ // 가로
+                answer[i][j] = arr1[i][j] + arr2[i][j];
+            }
+        }
+        return answer;
+    }
+}
+```
+
+
+
+
