@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "TIL(20240607) [Jpa:nullable=false와 @NotNull]"
+title:  "TIL(20240607) [뉴스피드 프로젝트 : 이메일 가입 및 인증 기능]"
 date:  2024-06-07
 categories: TIL Spring 코딩테스트
 ---
@@ -20,8 +20,9 @@ Step 3 : 이메일 인증이 완료되지 않은 회원들의 `회원상태코�
 그래서 컬럼에는 nullable=false라 되어 있는데, DB에서는 DDL생성 시 not null로 생성 되겠지만
 entity에서도 검증이 연결될까? 라는 의문이 생겼다. 그래서 찾아본 것이 컬럼에 nullable=false하지 않고 Validation- @NotNull로 해주면 자동으로 DDL생성 시 NotNull이 된다는 것을 알게되었다.
 
-
 [Jpa:nullable=false와 @NotNull](https://kafcamus.tistory.com/15)
+
+
 
 [Google Gmail SMTP 설정방법 및 메일 전송1](https://hyunmin1906.tistory.com/276)
 [Google Gmail SMTP 설정방법 및 메일 전송2](https://gwamssoju.tistory.com/108)
