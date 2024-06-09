@@ -1,0 +1,128 @@
+---
+layout: post
+title:  "TIL(20240609) [뉴스피드 프로젝트 :이메일 인증 및 회원가입 구현 수정]"
+date:  2024-06-09
+categories: TIL Spring 
+---
+
+---------------------------------------------------------------------
+
+
+# 📌 Spring
+
+## 💡 뉴스피드 프로젝트 : 이메일 인증 및 회원가입 구현 수정
+
+이전에 구현했던 부분들에 문제가 있음을 감지했다.
+
+그래서 다음과 같이 수정을 해보았다.
+사실 DB에 이메일 인증 관련해서 email과 code를 저장하고 싶었지만 일회성 같은 느낌이라 .. Redis로 구현하는 방법도 있었지만 아직 내가 Redis구현 방법에 대해서 정확하게 개념을 알고 있지 않아 Map컬렉션으로 구현을 해보았다.
+service 부분만 조금 수정을 했다.
+
+
+```java
+
+@Service
+@RequiredArgsConstructor
+public class UserService {
+
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JavaMailSender javaMailSender;
+    private static final String senderEmail = "ReviewSpot@gmail.com";
+    private static int code;
+    private final Map<String, String> verificationCodes = new HashMap<>();
+    private final Map<String, Boolean> verificationStatus = new HashMap<>();
+
+    // 인증번호 생성
+    public static String createCode() {
+        int code = (int) (Math.random() * (90000)) + 100000;
+        return String.valueOf(code);
+    }
+
+    // 이메일 생성
+    public MimeMessage createMail(String email, String code) throws MessagingException {
+        createCode();
+        MimeMessage message = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+        try {
+            helper.setFrom(senderEmail);
+            helper.setTo(email);
+            helper.setSubject("ReviewSpot [회원가입을 위한 이메일 인증]");
+            String body = "";
+            body += "<h3>" + "이메일 인증 번호" + "</h3>";
+            body += "<h1>" + code + "</h1>";
+            body += "<h3>" + "위 인증번호를 입력해주세요." + "</h3>";
+            helper.setText(body, true);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+        return message;
+    }
+
+    // 이메일 전송
+    public void sendMail(EmailRequestDto requestDto) throws MessagingException {
+        String code = createCode();
+        // 인증번호 임시저장
+        verificationCodes.put(requestDto.getEmail(), code);
+        // 검증확인 여부 임시저장
+        verificationStatus.put(requestDto.getEmail(), false);
+
+        MimeMessage message = createMail(requestDto.getEmail(), code);
+        javaMailSender.send(message);
+    }
+
+    // 인증번호 검증
+    public void checkCode(VerifyCodeRequestDto requestDto) {
+        String email = requestDto.getEmail();
+        String inputCode = requestDto.getVerificationCode();
+        String checkCode = verificationCodes.get(email);
+
+        if (checkCode != null && checkCode.equals(inputCode)) {
+            verificationStatus.put(email, true);
+        } else {
+            throw new IllegalArgumentException("인증번호가 일치하지 않거나 만료된 인증번호 입니다.");
+        }
+    }
+
+    // 회원가입
+    public void signup(SignupRequestDto requestDto) {
+        String userId = requestDto.getUserId();
+        String password = passwordEncoder.encode(requestDto.getPassword());
+        String userName = requestDto.getUserName();
+        String email = requestDto.getEmail();
+
+        Optional<User> checkEmail = userRepository.findByEmail(email);
+        if (checkEmail.isPresent()) {
+            throw new IllegalArgumentException("중복된 Email 입니다.");
+        }
+
+        boolean verified = verificationStatus.get(email);
+        UserStatus userStatus;
+        if (verified) {
+            userStatus = UserStatus.MEMBER;
+        } else {
+            userStatus = UserStatus.NOT_AUTH;
+        }
+
+        // 회원 중복 확인
+        Optional<User> checkUsername = userRepository.findByUserId(userId);
+        if (checkUsername.isPresent()) {
+            throw new IllegalArgumentException("중복된 사용자가 존재합니다.");
+        }
+
+        User user = new User(userId, password, userName, email, userStatus);
+        userRepository.save(user);
+    }
+
+```
+
+머리에 갑자기 과부하가 걸렸는지 너무 돌아가지 않았다.
+좋은 방법에 대해서 계속해서 고민하는데, 경험이 많지 않아서
+그런것 같다.. 다른사람들은 어떻게 구현하는지에 대해서 꾸준히 구글링하여 공부해야 할 것 같다. 
+
+
+
+
+
+
