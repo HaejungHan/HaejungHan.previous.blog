@@ -92,9 +92,10 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JavaMailSender javaMailSender;
-    private static final String senderEmail = "ReviewSpot@gmail.com";
+    private static final String senderEmail = "0reviewspot0@gmail.com";
     private static int code;
-    private final Map<String, String> codes = new HashMap<>();
+    private final Map<String, String> verificationCodes = new HashMap<>();
+    private final Map<String, Boolean> verificationStatus = new HashMap<>();
 
     // 인증번호 생성
     public static String createCode() {
@@ -127,20 +128,22 @@ public class UserService {
     public void sendMail(EmailRequestDto requestDto) throws MessagingException {
         String code = createCode();
         // 인증번호 임시저장
-        codes.put(requestDto.getEmail(), code);
-        MimeMessage message = createMail(requestDto.getEmail(), code);
+        verificationCodes.put(requestDto.getEmail(), code);
+        // 검증확인 여부 임시저장
+        verificationStatus.put(requestDto.getEmail(), false);
 
+        MimeMessage message = createMail(requestDto.getEmail(), code);
         javaMailSender.send(message);
     }
 
     // 인증번호 검증
-    public boolean checkCode(VerifyCodeRequestDto requestDto) {
+    public void checkCode(VerifyCodeRequestDto requestDto) {
         String email = requestDto.getEmail();
         String inputCode = requestDto.getVerificationCode();
-        String checkCode = codes.get(email);
+        String checkCode = verificationCodes.get(email);
 
-        if ((!checkCode.isEmpty()) && checkCode.equals(inputCode)) {
-            return true;
+        if (checkCode != null && checkCode.equals(inputCode)) {
+            verificationStatus.put(email, true);
         } else {
             throw new IllegalArgumentException("인증번호가 일치하지 않거나 만료된 인증번호 입니다.");
         }
@@ -152,8 +155,19 @@ public class UserService {
         String password = passwordEncoder.encode(requestDto.getPassword());
         String userName = requestDto.getUserName();
         String email = requestDto.getEmail();
-        String verificationCode = requestDto.getVerificationCode();
-        UserStatus userStatus = UserStatus.NOT_AUTH;
+
+        Optional<User> checkEmail = userRepository.findByEmail(email);
+        if (checkEmail.isPresent()) {
+            throw new IllegalArgumentException("중복된 Email 입니다.");
+        }
+
+        Boolean verified = verificationStatus.get(email);
+        UserStatus userStatus;
+        if (Boolean.TRUE.equals(verified) ) {
+            userStatus = UserStatus.MEMBER;
+        } else {
+            userStatus = UserStatus.NOT_AUTH;
+        }
 
         // 회원 중복 확인
         Optional<User> checkUsername = userRepository.findByUserId(userId);
@@ -161,33 +175,33 @@ public class UserService {
             throw new IllegalArgumentException("중복된 사용자가 존재합니다.");
         }
 
-        // 이메일 중복 확인
-        Optional<User> checkEmail = userRepository.findByEmail(email);
-        if (checkEmail.isPresent()) {
-            throw new IllegalArgumentException("중복된 Email 입니다.");
-        }
-
-        // 이메일 인증 완료 시 회원가입
-        VerifyCodeRequestDto verifyCodeRequestDto = new VerifyCodeRequestDto(email, verificationCode);
-        if (checkCode(verifyCodeRequestDto)) {
-            userStatus = UserStatus.MEMBER;
-            User user = new User(userId, password, userName, email, userStatus);
-            userRepository.save(user);
-        }
+        User user = new User(userId, password, userName, email, userStatus);
+        userRepository.save(user);
     }
+
 ```
-사실 서비스 부분이 정말 힘들었는데, SMTP 같은 경우는 버전이 다양해 버전이 하나라도 맞지 않으면 실행이 되지 않는다는 글을
-많이 보았던 것 같다. 나 역시도 아래와 같은 에러에 직면했고 3시간 동안 원인을 찾기 위해 고군분투했다. 
+
+랜덤으로 난수 생성(인증코드) 후에 요청한 이메일과 인증코드를 MAP에 임시저장을 하고
+메일을 보낼 때 MimeMessage를 통해서 해당 이메일에 코드를 넣어 JavaMailSender로 보내는 형식으로 구현해보았다. 
+
+인증번호는 Map에 임시저장했던 email key를 통해 code를 찾아 inputcode와 일치하면
+인증처리 하도록 구현했다. Map을 통해 구현한 이유를 묻는다면, 변명을 보태 사실 시간이 부족해서였다. 팀원들과 같이 프로젝트를 마감기한을 정해 제출하기 전날 코드리뷰와 코드리팩토링을 하기로 약속했기에 무조건 이번주 일요일까지 구현을 해야 했던 터라 DB저장 형식으로 해보고 싶었지만 다음 번에 도전해보기로 했다. Map을 사용할 경우 서버가 끊기게 되면 저장된 내용이 사라지기 때문에 다시 이메일 인증을 해야한다는 사실.. 허허허.. 정말 이 부분이 가장 아쉽다. 
+
+그리고 어려웠던 부분을 얘기하자면 SMTP 같은 경우는 버전이 다양해 버전이 하나라도 맞지 않으면 실행이 되지 않는다는 글을 많이 보았던 것 같다. 나 역시도 아래와 같은 에러에 직면했고 3시간 동안 원인을 찾기 위해 고군분투했다. 
 
 ```java
+
 "Error": "Mail server connection failed. Failed messages: jakarta.mail.NoSuchProviderException: smtp"
+
 ```
 
 application.properties에 아래 내용을 추가했더니.. 성공... 😂 울뻔했다... 하하핳
-
+사실 결국에는 튜터님의 도움을 받았다. 5시간 동안 버전을 찾아 적용하고 테스트를 반복했는데 도무지 어떤 부분에서 잘못되었는지 파악하지 못했기 때문이다. 다음번에는 이런 불상사가 생기지 않도록 수동으로 SMTP 설정하도록 해야겠다. 
 
 ```java
+
 spring.mail.properties.mail.smtp.ssl.trust=smtp.gmail.com
+
 ```
 
 
@@ -222,10 +236,11 @@ public class EmailRequestDto {
 
 ```
 
-이메일 인증 구현은 정말 다양한 방법이 많은 것 같았다. jwt로 토큰을 생성하여 사용자정보를 토큰에 넣어
-일치하는지 확인하는 형식도 찾아보니 있었다. 이 방법은 잠시 주머니에 넣어두었다. 
-댓글 좋아요 기능 구현도 남았기에 마감기한에 제출할 수 없을 것 같아서 다음에 나의 개인 프로젝트에 토큰으로 이메일 인증구현을 해보려고 한다. 빠샤빠샤🦾
+이메일 인증 구현은 정말 다양한 방법이 많은 것 같았다. jwt로 토큰을 생성하여 사용자정보를 토큰에 넣어 일치하는지 확인하는 형식도 찾아보니 있었다. 그리고 
+인증 만료시간을 구현하기 위해 최적화 된 Redis로 구현된 것도 보았는 것 같다.
+사실 깊이 공부를 하지 못해서 저런 것들이 있구나.. 하고 넘어간 것 같다. 
 
+댓글 좋아요 기능 구현도 남았기에 마감기한에 제출할 수 없을 것 같아서 다음에 나의 개인 프로젝트에 토큰으로 이메일 인증구현을 해보려고 한다. 빠샤빠샤🦾
 
 
 ---------------------------------------------------------------------
