@@ -175,6 +175,125 @@ public class ProfileResponseDto {
     }
 ```
 
+팀원분께서 비밀번호 변경과 프로필 수정 기능은 분리하는게 어떨지 물어보셔서
+그 부분에 대해서 고려해보니, 비밀번호 변경과 프로필 내용 수정을 분리한 기능을 구현한 서비스들을 많이 경험했던 것 같아
+다시 수정하게 된다. 내가 이런 사소한 부분에서 조금씩 놓치고 있는 것 같아서 처음 기획설계를 할 때 조금 더 신중하게 생각해보자고 
+마음 먹었다.
+
+
+수정한 프로필 관리 기능은 다음과 같다. 비밀번호 변경 API를 하나 더 만들어 프로필 내용 수정 API, 비밀번호 변경 API를 각각 구현해보았다.
+
+```java
+@RestController
+@RequestMapping("/api")
+@RequiredArgsConstructor
+public class ProfileController {
+
+    private final ProfileService profileService;
+
+    // 사용자의 프로필 조회
+    @GetMapping("/profile")
+    public ResponseEntity<ProfileResponseDto> getProfile(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        ProfileResponseDto responseDto = profileService.getProfile(userDetails.getUser());
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+    }
+
+    // 사용자의 프로필 수정
+    @PutMapping("/profile")
+    public ResponseEntity<String> updateProfile(@RequestBody @Valid ProfileRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        profileService.updateProfile(requestDto, userDetails.getUser());
+        return new ResponseEntity<>("프로필이 성공적으로 수정되었습니다.", HttpStatus.OK);
+    }
+
+    // 비밀번호 변경
+    @PutMapping("/profile/password")
+    public ResponseEntity<String> updatePassword(@RequestBody @Valid PasswordRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        profileService.updatePassword(requestDto,userDetails.getUser());
+        return new ResponseEntity<>("비밀번호 변경이 완료되었습니다.", HttpStatus.OK);
+    }
+}
+```
+
+```java
+@Service
+@RequiredArgsConstructor
+public class ProfileService {
+
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    // 사용자 프로필 조회
+    public ProfileResponseDto getProfile(User user) {
+        User currentUser = findById(user);
+        ProfileResponseDto responseDto = new ProfileResponseDto(user);
+        return responseDto;
+    }
+
+    // 사용자 프로필 수정
+    @Transactional
+    public void updateProfile (ProfileRequestDto requestDto, User user) {
+        User currentUser = findById(user);
+        currentUser.update(requestDto);
+    }
+
+    // 비밀번호 변경
+    @Transactional
+    public void updatePassword(PasswordRequestDto requestDto, User user) {
+        User currentUser = findById(user);
+        String password = requestDto.getPassword();
+        String changePassword = requestDto.getChangePassword();
+
+        // 현재 비밀번호가 사용자의 비밀번호와 맞는지 검증
+        if (!passwordEncoder.matches(password, currentUser.getPassword())) {
+            throw new IllegalArgumentException("현재 비밀번호와 사용자의 비밀번호가 일치하지 않습니다.");
+        }
+
+        // 변경할 비밀번호와 현재 비밀번호가 동일한지 검증
+        if (passwordEncoder.matches(changePassword, currentUser.getPassword())) {
+            throw new IllegalArgumentException("동일한 비밀번호로는 변경할 수 없습니다.");
+        }
+        // 변경할 비밀번호로 수정
+        currentUser.setPassword(passwordEncoder.encode(changePassword));
+    }
+
+    private User findById(User user) {
+        return userRepository.findById(user.getId()).orElseThrow(() ->
+                new IllegalArgumentException("해당 사용자는 존재하지 않습니다.")
+        );
+    }
+
+}
+
+```
+
+PasswordRequestDto는 요청값을 따로 받기 위해 만들었다.
+
+```java
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import lombok.Getter;
+
+@Getter
+public class PasswordRequestDto {
+    @NotBlank(message = "패스워드를 입력해주세요.")
+    @Pattern(
+            regexp = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]).{10,}$",
+            message = "비밀번호는 대소문자 영문, 숫자, 특수문자를 최소 1글자씩 포함하며 최소 10자 이상이어야 합니다."
+    )
+    private String password;
+
+    @NotBlank(message = "변경하려는 패스워드를 입력해주세요.")
+    @Pattern(
+            regexp = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]).{10,}$",
+            message = "비밀번호는 대소문자 영문, 숫자, 특수문자를 최소 1글자씩 포함하며 최소 10자 이상이어야 합니다."
+    )
+    private String changePassword;
+}
+
+```
+
+
 
 ---------------------------------------------------------------------
 
@@ -278,11 +397,7 @@ groupCount():	괄호로 지정해서 그룹핑한 패턴의 전체 개수 반환
 matches():	패턴이 전체 문자열과 일치할 경우 true반환(일부 문자열이 아닌 전체 문자열과 완벽히 일치 해야한다)
 ```
 
-
-
-
 [정규표현식 이해하기](https://adjh54.tistory.com/104)
-<br>
 [문자열이 숫자인지 확인하는 방법](https://velog.io/@dyko/string-isNumberic)
 
 
