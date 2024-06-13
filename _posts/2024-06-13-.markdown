@@ -1,0 +1,45 @@
+---
+layout: post
+title:  "TIL(20240613) [테스트코드: AOP]"
+date:  2024-06-13
+categories: TIL AOP
+---
+
+---------------------------------------------------------------------
+
+# 📌 Spring
+
+### 💡 AOP 추가하기
+- 모든 API(Controller)가 호출될 때, Request 정보(Request URL, HTTP Method)를 **@Slf4J Logback** 라이브러리를  활용하여 Log로 출력해주세요.
+- 컨트롤러 마다 로그를 출력하는 코드를 추가하는것이 아닌, AOP로 구현해야만 합니다.
+
+
+```java
+
+@Slf4j
+@Aspect
+@Component
+public class ControllerAop {
+
+  @Before("execution(* com.sparta.reviewspotproject.controller.*Controller.*(..))")
+  
+  public void logBefore(JoinPoint joinPoint) {
+    ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+    HttpServletRequest request = attributes.getRequest();
+
+    log.info("Request URL : {}", request.getRequestURL());
+    log.info("HTTP Method : {}", request.getMethod());
+
+  }
+}
+
+
+```
+
+테스트코드.. 너무 어렵다.. 
+
+
+
+
+
+
