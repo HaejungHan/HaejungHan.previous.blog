@@ -1,8 +1,8 @@
 ---
 layout: post
-title:  "TIL(20240615) []"
+title:  "TIL(20240615) [Controller MockMvc 테스트 코드]"
 date:  2024-06-15
-categories: TIL Spring 코딩테스트
+categories: TIL Spring
 ---
 
 ---------------------------------------------------------------------
@@ -10,208 +10,50 @@ categories: TIL Spring 코딩테스트
 
 # 📌 Spring
 
-## 💡 테스트 코드 : 단위테스트 개념
+## 💡 Controller 테스트 코드 작성하기
 
-**단위테스트란?** 
-  1) 하나의 모듈을 기준으로 독립적으로 진행되는 가장 작은 단위의 테스트
-  2) 하나의 모듈이란 각 계층에서 하나의 기능 또는 메소드를 의미함
-  3) 즉, 하나의 기능이 올바르게 작동하는지 독립적으로 테스트 하는 것을 의미함
+Controller 테스트 코드를 작성하기 앞서서 Controller테스트에서는 무엇을 체크해야 할까? 라는 생각이 들었고, 무작정 테스트코드를 작성하기 보다는 Controller의 책임범위, 어떤것을 테스트 하면 좋을지에 대해서 정리를 하고 시작한다면 효율적으로 진행할 수 있을 것 같아 개념정리를 하고 시작해보았다.
 
-**단위테스트가 필요한 이유는?**
-  1) 일반적으로 테스트 코드를 작성한다고 하면 거의 단위테스트를 말한다.
-  2) 통합테스트는 실제 여러 컴포넌트들 간의 상호작용을 테스크 하는 거기 때문에 모든 컴포넌트들이 실행한 상태에서 테스트를 하게 되므로 어플리케이션에 들어있는 컴포넌트들이 많아 질수록 테스트 시간이 길어진다.
-  3) 단위테스는 테스트하고자 하는 부분만 독립적으로 테스트 하기 때문에 해당 단위를 유지보수 했거나 리팩토링 한 경우에도 빠르게 문제 여부를 확인할 수 있다.
+3 Layer Architecture 중 클라이언트의 가장 가까이에서 요청과 응답을 처리하는 Controller에 대해
+어떤 테스트를 진행하면 좋을지 개념정리!
 
-**단위테스트의 한계는?**
-  1) 대체적으로 어플리케이션은 하나의 기능을 처리하기 위해 다른 객체들과 데이터를 주고받는 복잡한 구조를 띄고 있다.
-  2) 위에서 말한 것 처럼 단위테스트는 해당 기능에 대한 독립적인 데스트기 때문에 다른 객체들과 데이터를 주고 받는 경우에 문제가 발생하여 이러한 문제를 해결하기 위해 테스트하고자 하는 기능과 연관된 모듈에서 가짜 데이터, 정해진 반환값이 필요하게 된다.
-  3) 즉, 단위테스트는 테스트 하고자 하는 기능과 연관된 다른 모듈은 연결이 단절되어야 독립적인 단위테스트가 가능해진다.
+**Controller의 책임범위**
 
-**좋은 테스트 코드는?**
-  - 코드는 계속해서 변하는 요구사항에 맞춰 변경된 코드는 버그의 가능성을 항상 내포하고 있다. 즉, 변경된 코드를 테스트 코드로 검증함으로써 이러한 문제를 해결할 수 있는 것이 좋은 테스트 코드라고 할 수 있다. 
-  - FIRST 규칙
-  1) F : 테스트는 빠르게 동작하고 자주 가동해야한다.
-  2) I : 각각의 테스트는 독립적이어야 하고 의존성이 없어야 한다.
-  3) R : 어느환경에서도 반복이 가능해야 한다.
-  4) S : 테스트는 성공 또는 실패 값으로 결과를 내어 자체적으로 검증되야한다.
-  5) T : 테스트는 테스트 하려는 실제코드를 구현하기 직전에 작성해야한다.
+    1. http 요청을 듣고, http 응답을 책임진다.
+    2. http 요청을 파싱하여 들어온 데이터를 역직렬화 한다.
+    3. http 요청 구믄을 분석하고, url/body/param 등의 변수에서 java 객체를 생성한다.
+    4. 들어온 데이터가 유효한지 검증한다. 
+    5. 비지니스 로직(service)를 호출한다.
+    6. 비지니스 로직의 출력을 http 응답으로 직렬화 한다.
+    7. 처리 도중에 예외가 발생하면 사용자에게 오류메세지와 http 상태응답을 한다.
 
-개념적인 부분을 정리하고 가야겠다고 생각한 건 어제 테스트 코드를 작성하면서 들었다. 매번 공부하는 내용들이 낯설다 보니 전체적인 흐름을 파악은 했지만 개념들이 머리속에 와닿지 않아 쉽사리 까먹었다. 이렇게 한번 개념정리와 필요성에 대한 부분을 나의 머리속에 주입해주면서... 테스트 코드를 작성해보자 라는 마음을 가지니 한결 와닿기도 한다. 
+이렇게 정리를 한번 하고 나니 Controller가 많은 일들을 하고 있구나 라고 생각했던 게 다시 한번 되새김질이 되었고, Controller에는 비지니스로직을 두지 말라고 하는 이유도 바로 위의 책임범위가 충분히 많기 때문에
+역할 분리가 필요하다는 것을 알 수 있다. 
 
-개념정리와 필요성에 대해서 정리하고 나니, 기능구현에만 너무 집중했던 내가 조금 한심하게도 느껴진다.. 사실 테스트를 1-10까지 다 해보기는 시간이 너무 부족했다. (변명일지도 모른다, 밤새서 하면 할 수 있다) 그래서 제대로 작동하는지에 대한 점검이 필요하다고 생각은 했지만 매번 그냥 넘어가고 내가 구현한 부분이 어떻게 잘못되었는지는 사실 확인하지 못한채로 항상 찝찝하게 넘어갔던 것 같다. 대충 작동하면 되겠지..라는 생각이 나의 오만이다. 반성하자. 
+그렇다면 어떤걸 Controller에서 테스트 해야하는가?
 
-코딩을 통해서 자아성찰과 나에 대해서 알아가는 느낌이라.. 제 2의 인생을 살아가는 요즘이다. 
+    1. Controller가 해당 url을 잘 읽어들이는 지 확인
+    2. 들어온 데이터가 원하는 java object로 직렬화가 되는지 확인
+    3. 들어온 데이터의 validation 확인이 잘 되는지
+    4. 비지니스로직을 잘 호출 했는지
+    5. http 응답 본문에 json형태로 잘 들어갔는지 
+    6. 예외처리가 잘되었는지
 
-
-## 💡 Entity와 DTO 단위테스트 작성
-
-1) Entity 테스트 : Entity의 주요 필드와 메소드에 대한 테스트를 작성하는 것이며 데이터베이스와의 상호작용 및 entity의 상태변화를 확인
-2) DTO 테스트 : DTO는 주로 테이터 전송을 담당하며, DTO 필드에 대한 getter,setter 메서드의 동작을 확인
-
-```java
-
-public class UserTest {
-
-  @Test
-  @DisplayName("사용자 entity 테스트")
-  public void entityTest() {
-    // given
-    String userId = "haniyoni1234";
-    String password = "@haniandyoni1234";
-    String userName = "하니와요니";
-    String email = "hhanni0705@gmail.com";
-    UserStatus userStatus = UserStatus.MEMBER;
-
-    // when
-    User user = new User(userId, password, userName, email, userStatus);
-
-    // then
-    assertEquals(userId, user.getUserId());
-    assertEquals(password, user.getPassword());
-    assertEquals(userName, user.getUserName());
-    assertEquals(email, user.getEmail());
-    assertEquals(userStatus, user.getUserStatus());
-    assertNotNull(user.getCreatedAt());
-  }
-
-  @Test
-  @DisplayName("사용자의 프로필 update 메서드 테스트")
-  public void updateTest() {
-    // given
-    ProfileRequestDto requestDto = new ProfileRequestDto();
-    requestDto.setUserName("요니와하니");
-    requestDto.setTagLine("만나서 반갑습니다. 여러분");
-
-    // when
-    User user = new User("haniyoni1234", "@haniandyoni1234", "하니와요니", "hhanni0705@gmail.com",
-        UserStatus.MEMBER);
-    user.update(requestDto);
-
-    // then
-    assertEquals("요니와하니", requestDto.getUserName());
-    assertEquals("만나서 반갑습니다. 여러분", requestDto.getTagLine());
-    assertNotNull(user.getModifiedAt());
-
-  }
-
-}
-
-```
-
-```java
-
-public class PostTest {
-
-  @Test
-  @DisplayName("게시물 entity Test")
-  public void entityTest () {
-    // given
-    User user = new User();
-
-    PostRequestDto requestDto = new PostRequestDto();
-    requestDto.setTitle("게시물의 제목입니다.");
-    requestDto.setContents("게시물의 내용입니다.");
-
-    // when
-    Post post = new Post(requestDto, user);
-
-    // then
-    assertEquals("게시물의 제목입니다.", post.getTitle());
-    assertEquals("게시물의 내용입니다.", post.getContents());
-    assertEquals(user, post.getUser());
-    assertEquals(0, post.getPostLikesCount());
-
-  }
-
-  @Test
-  @DisplayName("게시물 update 메서드 테스트")
-  public void updateTest() {
-    // given
-    User user = new User();
-
-    PostRequestDto updateRequestDto = new PostRequestDto();
-    updateRequestDto.setTitle("게시물의 제목을 변경합니다.");
-    updateRequestDto.setContents("게시물의 내용을 변경합니다.");
-
-    // when
-    PostRequestDto requestDto = new PostRequestDto();
-    requestDto.setTitle("원래의 게시물 제목 입니다.");
-    requestDto.setContents("원래의 게시물 내용 입니다.");
-    Post originalPost = new Post(requestDto, user);
-
-    originalPost.update(updateRequestDto);
-
-    // then
-    assertEquals("게시물의 제목을 변경합니다.", originalPost.getTitle());
-    assertEquals("게시물의 내용을 변경합니다.", originalPost.getContents());
-
-  }
-
-}
-
-```
-
-```java
-
-public class CommentTest {
-
-  @Test
-  @DisplayName("댓글 entity Test")
-  public void entityTest() {
-    // given
-    User user = new User();
-
-    Post post = new Post();
-
-    CommentRequestDto requestDto = new CommentRequestDto();
-    requestDto.setContents("댓글의 내용입니다.");
-
-    // when
-    Comment comment = new Comment(requestDto, post, user);
-
-    // then
-    assertEquals("댓글의 내용입니다.", comment.getContents());
-    assertEquals(user, comment.getUser());
-    assertEquals(post.getId(), comment.getPost().getId());
-    assertEquals(0, comment.getCommentLikesCount());
-
-  }
-
-  @Test
-  @DisplayName("댓글 update 메서드 테스트")
-  public void updateTest() {
-    // given
-    User user = new User();
-
-    Post post = new Post();
-
-    CommentRequestDto updateRequestDto = new CommentRequestDto();
-    updateRequestDto.setContents("댓글의 내용을 변경합니다.");
-
-    // when
-    CommentRequestDto requestDto = new CommentRequestDto();
-    requestDto.setContents("원래의 댓글 내용입니다.");
-    Comment originalComment = new Comment(requestDto, post, user);
-
-    originalComment.update(updateRequestDto);
-
-    // then
-    assertEquals("댓글의 내용을 변경합니다.", originalComment.getContents());
-
-  }
-}
+스프링부트에서 제공하는 Controller의 대표적인 @SpringBootTest, @WebMvcTest 어노테이션 중
+@WebMvcTest 를 사용하여 테스트를 하려고 한다. 
 
 
-```
+**@WebMvcTest vs @SpringBootTest**
+  - @SpringBootTest 는 프로젝트의 전체 컨텍스트를 로드하여 빈을 주입하기 때문에 속도가 느리고, 통합 테스트를 할 때 많이 사용한다.
+  - 필요한 빈만을 등록하여 테스트를 진행하고자 한다면 슬라이스 테스트 어노테이션인 @WebMvcTest를 사용하는 것이 효율적이다.
 
-처음 작성해보는 Entity 테스트 코드라.. 정확이 이게 맞는지는 모르겟지만 각 객체를 생성할 때 requestDto를 통해서 값이 잘 들어가는지에 대해서 확인을 해보는 Test, 
-update 메서드 같은 경우는 한 객체의 필드 값을 수정할 때 
-requestDto를 통해서 값이 잘 변경되었는지 확인하는 Test라고 
-생각했다. 
+**테스트 코드 작성 순서**
 
-assertEquals와 assertNotNull만 **then**에서 사용을 했다. 다른 뭔가가 더 있을까.. 했지만 entity에 직접적인 예외처리라던가 별다른 부분이 없어서, 하지 않았던 것 같다. 사실 각 entity 모두 createdAt,modifiedAt를 가지고 있는데 각 객체별(user빼고)로 extends TimeStamped를 하고 있어 해당 부분은 뺐다. 사실 통일성이 없긴 했는데.. 어떻게 할까 하다가.. user의 경우는 NotNull로 검증해보고 싶어 user entity 코드를 리팩토링 하진 않았다. 추후 이 부분에 대해서 검증하는 방법에 대해 공부를 해 다시 올리도록 하겠다. 
+1) MockMvc를 통해서 API 호출, 해당 컨트롤러에서 의존하고 있는 객체는 Mock객체로 만들어 주입(@MockBean)사용하기
+2) Mock 객체는 "가짜 객체" 라 리턴 값이 없기에 given, when 등으로 원하는 값을 리턴하도록 조작해줘야 함
+3) 로직이 진행된 후 verify를 통해 검증하기
 
-<br>
+
 
 -------------------------------------------------------------------------
 
