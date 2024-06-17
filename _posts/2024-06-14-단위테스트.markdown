@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "TIL(20240614) [테스트코드:단위테스트, 10진법->3진법]"
+title:  "TIL(20240614) [테스트코드:단위테스트 , 10진법->3진법]"
 date:  2024-06-14
 categories: TIL Spring 코딩테스트
 ---
@@ -9,6 +9,19 @@ categories: TIL Spring 코딩테스트
 
 
 # 📌 Spring
+
+✨들어가기전 : 
+- 단위 테스트를 하기 위해서 Mockito를 이용하여 다른 계층과 의존관계를 단절 시켜 주어야 한다. 
+- 그래서 아래와 같은 의존성을 추가해야한다.
+
+```java
+// build.gradle
+
+dependencies {
+    testImplementation 'org.mockito:mockito-core:4.8.0
+}
+
+```
 
 ## 💡 테스트 코드 : 단위테스트 개념
 

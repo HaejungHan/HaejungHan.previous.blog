@@ -10,7 +10,7 @@ categories: TIL Spring
 
 # 📌 Spring
 
-## 💡 Service 테스트 코드 작성하기
+## 💡 Service 단위테스트 
 
 
 [JUnit5 스프링부트 단위 테스트 작성 예시(Controller & Service)](https://m.blog.naver.com/sosow0212/222838356590)

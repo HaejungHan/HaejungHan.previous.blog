@@ -10,7 +10,7 @@ categories: TIL Spring
 
 # 📌 Spring
 
-## 💡 Controller 테스트 코드 작성하기
+## 💡 Controller MockMvc 테스트 코드 
 
 Controller 테스트 코드를 작성하기 앞서서 Controller테스트에서는 무엇을 체크해야 할까? 라는 생각이 들었고, 무작정 테스트코드를 작성하기 보다는 Controller의 책임범위, 어떤것을 테스트 하면 좋을지에 대해서 정리를 하고 시작한다면 효율적으로 진행할 수 있을 것 같아 개념정리를 하고 시작해보았다.
 
@@ -51,6 +51,6 @@ Controller 테스트 코드를 작성하기 앞서서 Controller테스트에서�
 
 1) MockMvc를 통해서 API 호출, 해당 컨트롤러에서 의존하고 있는 객체는 Mock객체로 만들어 주입(@MockBean)사용하기
 2) Mock 객체는 "가짜 객체" 라 리턴 값이 없기에 given, when 등으로 원하는 값을 리턴하도록 조작해줘야 함
-3) 로직이 진행된 후 verify를 통해 검증하기
+3) 로직이 진행된 후 verify를 통해 검증하기 (나는 service테스트에서 해당 부분을 처리하도록 바꾸었다.)
 
 
