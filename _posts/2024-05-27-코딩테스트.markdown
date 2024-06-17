@@ -11,6 +11,7 @@ categories: TIL Spring 코딩테스트
 # 📌 Spring 
 
 ### 💡 Optional
+
 ## isPresent() 
 - boolean 타입
 - Optional 객체가 값을 가지고 있다면 true , 없다면 false 리턴

@@ -9,7 +9,7 @@ categories: TIL Spring 코딩테스트
 
 # 📌 Spring
 
-## 🔒 Error와의 싸움
+## 🔒 Status code: 4XX
 1) StatusCode:401(Unauthorized:권한없음-> 지정한 리소스에 대한 엑세스 권한이 없다.)
 ```
 No content to map due to end-of-input
