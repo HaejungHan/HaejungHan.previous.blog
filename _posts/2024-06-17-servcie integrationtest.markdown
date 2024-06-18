@@ -1,9 +1,10 @@
 ---
 layout: post
-title:  "TIL(20240617) [(Service) Integration Test]"
+title:  "TIL(20240617) [Service Integration Test]"
 date:  2024-06-17
 categories: TIL Spring 코딩테스트
 ---
+
 
 ---------------------------------------------------------------------
 
@@ -86,23 +87,4 @@ class Solution {
 
 ```
 
-class Solution {
-    public String solution(String s) {
-        String answer = "";
-        String[] sArr = s.split("");
-        int index = 0;
-        
-        for (int i=0; i<sArr.length; i++){
-            if(sArr[i].equals(" ")){
-                index=0;
-            } else if(index % 2 == 0){
-                sArr[i] = sArr[i].toUpperCase();
-                index++;
-            } else if (index % 2 != 0) {
-                sArr[i] = sArr[i].toLowerCase();
-                index++;
-            } answer += sArr[i];
-        } return answer;
-    }
-}
 
