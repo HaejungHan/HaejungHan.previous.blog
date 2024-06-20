@@ -1,0 +1,195 @@
+---
+layout: post
+title:  "TIL(20240620) [아웃소싱프로젝트: 댓글 구현]"
+date:  2024-06-20
+categories: TIL Spring
+---
+
+---------------------------------------------------------------------
+
+# 📌 Spring
+
+## 💡 아웃소싱 프로젝트 : 댓글 구현
+
+```java
+
+@RestController
+@RequestMapping("/api/posts")
+@RequiredArgsConstructor
+public class CommentController {
+
+  private final CommentService commentService;
+
+  // 댓글 작성
+  @PostMapping("/{postId}/comments")
+  public ResponseEntity<CommentResponseDto> createComment(@PathVariable Long postId,
+      @RequestBody @Valid CommentRequestDto requestDto,
+      @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(commentService.createComment(postId, requestDto, userDetails.getUser()));
+  }
+
+  // 선택한 게시물의 댓글 조회
+  @GetMapping("/{postId}/comments")
+  public ResponseEntity<List<CommentResponseDto>> getComments(@PathVariable Long postId) {
+    return ResponseEntity.status(HttpStatus.OK).body(commentService.getComments(postId));
+  }
+
+  // 댓글 수정
+  @PutMapping("/{postId}/comments/{commentId}")
+  public ResponseEntity<CommentResponseDto> updateComment(@PathVariable Long postId,
+      @PathVariable Long commentId,
+      @RequestBody @Valid CommentRequestDto requestDto,
+      @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(commentService.updateComment(postId, commentId, requestDto, userDetails.getUser()));
+  }
+
+  // 댓글 삭제
+  @DeleteMapping("/{postId}/comments/{commentId}")
+  public ResponseEntity<String> deleteComment(@PathVariable Long postId,
+      @PathVariable Long commentId,
+      @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    commentService.deleteComment(postId, commentId, userDetails.getUser());
+    return ResponseEntity.status(HttpStatus.OK).body("댓글이 성공적으로 삭제되었습니다.");
+  }
+
+}
+
+```
+
+```java
+
+@Service
+@RequiredArgsConstructor
+public class CommentService {
+
+  private final CommentRepository commentRepository;
+  private final PostService postService;
+
+  // 댓글 작성
+  public CommentResponseDto createComment(Long postId, CommentRequestDto requestDto, User user) {
+    Post post = findPostById(postId);
+    Comment comment = commentRepository.save(new Comment(requestDto, post, user));
+    return new CommentResponseDto(comment);
+  }
+
+  // 댓글 조회
+  public List<CommentResponseDto> getComments(Long postId) {
+    Post post = findPostById(postId);
+    List<Comment> comments = post.getComments();
+    List<CommentResponseDto> commentList = new ArrayList<>();
+    for (Comment comment : comments) {
+      commentList.add(new CommentResponseDto(comment));
+    }
+    return commentList;
+  }
+
+  // 댓글 수정
+  @Transactional
+  public CommentResponseDto updateComment(Long postId, Long commentId, CommentRequestDto requestDto,
+      User user) {
+    Post post = findPostById(postId);
+    Comment comment = findCommentById(commentId);
+    if (!comment.getUser().getUserSeq().equals(user.getUserSeq())) {
+      throw new CustomException(ErrorCode.COMMENT_NOT_USER);
+    }
+    comment.updateComment(requestDto);
+    return new CommentResponseDto(comment);
+  }
+
+  // 댓글 삭제
+  public void deleteComment(Long postId, Long commentId, User user) {
+    Comment comment = findCommentById(commentId);
+    if (!comment.getUser().getUserSeq().equals(user.getUserSeq())) {
+      throw new CustomException(ErrorCode.COMMENT_NOT_USER);
+    }
+    commentRepository.delete(comment);
+  }
+
+  public Comment findCommentById(Long commentId) {
+    return commentRepository.findById(commentId).orElseThrow(() ->
+        new CustomException(ErrorCode.COMMENT_NOT_FOUND));
+  }
+
+  private Post findPostById(Long postId) {
+    return postService.findById(postId);
+  }
+
+}
+
+```
+
+```java
+
+@Entity
+@Getter
+@Table(name = "post")
+@NoArgsConstructor
+public class Post extends Timestamped {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId", nullable = false)
+    private User user;
+
+    @Column(nullable = false)
+    private String title;
+
+    @Column(nullable = false)
+    private String content;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments;
+
+    public Post(PostRequestDto requestDto, User user) {
+        this.title = requestDto.getTitle();
+        this.content = requestDto.getContent();
+        this.user = user;
+    }
+
+    public void update(PostRequestDto requestDto) {
+
+        if (requestDto.getTitle() != null) {
+            this.title = requestDto.getTitle();
+        }
+        if (requestDto.getContent() != null) {
+            this.content = requestDto.getContent();
+        }
+    }
+
+```
+
+------------------------------------------------------------------
+
+## 📌 코딩테스트1️⃣ : 크기가 작은 부분 문자열
+
+### 🔒 문제 : 숫자로 이루어진 문자열 t와 p가 주어질 때, t에서 p와 길이가 같은 부분문자열 중에서, 이 부분문자열이 나타내는 수가 p가 나타내는 수보다 작거나 같은 것이 나오는 횟수를 return하는 함수 solution을 완성하세요. 예를 들어, t="3141592"이고 p="271" 인 경우, t의 길이가 3인 부분 문자열은 314, 141, 415, 159, 592입니다. 이 문자열이 나타내는 수 중 271보다 작거나 같은 수는 141, 159 2개 입니다.
+
+### 🚫 조건 : 
+- 1 ≤ p의 길이 ≤ 18
+- p의 길이 ≤ t의 길이 ≤ 10,000
+- t와 p는 숫자로만 이루어진 문자열이며, 0으로 시작하지 않습니다.
+
+
+## 🔓 문제풀이
+
+```java
+
+class Solution {
+    public int solution(String t, String p) {
+        int answer = 0;
+        long pNum = Long.parseLong(p);
+        for(int i=0; i<t.length() - p.length() + 1; i++){ 
+            String str = t.substring(i, i + p.length()); // t를 p문자열 길이만큼 자르기
+            if (Long.parseLong(str) <= pNum){ // 작거나 같을때 
+                answer++;
+            }
+        }
+        return answer;
+        }
+    }
+
+```
