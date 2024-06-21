@@ -1,0 +1,166 @@
+---
+layout: post
+title:  "TIL(20240620) [아웃소싱프로젝트: 팔로우 구현]"
+date:  2024-06-20
+categories: TIL Spring
+---
+
+---------------------------------------------------------------------
+
+# 📌 Spring
+
+## 💡 아웃소싱 프로젝트 : 팔로우 구현
+
+이번 프로젝트의 주제를 익명게시판으로 했기 때문에
+익명게시판/비익명게시판으로 구분하였고, 비익명게시판 조회에서
+자신이 팔로우한 사람들의 게시물을 최신순으로 조회할 수 있도록 구현해보았다.
+
+- **팔로우 기능 구현**
+    - 특정 사용자를 팔로우 / 언팔로우를 할 수 있습니다.
+    - 팔로우 기능이 구현되었다면 뉴스피드에 팔로우하는 사용자의 게시물을 볼 수 있습니다.
+    - 팔로우를 하고 있는 사람들이 작성한 게시물을 볼 때 정렬 기준은 최신순입니다.
+
+```java
+
+public List<PublicPostResponseDto> getFollowedPosts(User user, int page, int pageSize) {
+    Pageable pageable = PageRequest.of(page, pageSize);
+
+    User currentUser = userService.findByUserSeq(user.getUserSeq());
+    List<Follow> follows = followRepository.findByFromUser(currentUser);
+
+    List<PublicPostResponseDto> publicPostResponseDtos = new ArrayList<>();
+    for (Follow followerList : follows) {
+      User followedUser = followerList.getToUser();
+      Page<PublicPost> publicPosts = postRepository.findByUserOrderByCreatedAtDesc(followedUser, pageable);
+      if (publicPosts.getTotalElements() == 0) {
+        throw new CustomException(ErrorCode.POST_EMPTY);
+      }
+      for(PublicPost publicPost : publicPosts) {
+        PublicPostResponseDto responseDto = new PublicPostResponseDto(publicPost);
+        publicPostResponseDtos.add(responseDto);
+      }
+    }
+    return publicPostResponseDtos;
+  }
+
+```
+
+내가 팔로우한 사람들의 게시물을 조회하는 부분에서 복잡해지는 것 같아
+정리가 안되어서 조금 고생했던 것 같다 🤣
+
+구현한 코드에 대해서 간단하게 설명을 해보자면 userService에서 user의 정보를 가져오고 currentUser가 팔로우한 모든 사용자를 가져온 다음 그 모든 사용자의 publicPost를 가져오고 최신순으로 페이지 처리를 한다. publicPosts가 0 이라면 예외를 날리고 아니라면 reponseDto에 객체에 publicPost를 담아서 반환한다.
+
+
+```java
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api")
+public class FollowController {
+
+  private final UserService userService;
+  private final FollowService followService;
+
+  // 팔로우
+  @PostMapping("/follower")
+  public ResponseEntity<String> followUser(@RequestBody @Valid FollowRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    User toUser = userService.findByUserSeq(requestDto.getToUserSeq());
+    User fromUser = userService.findByUserSeq(userDetails.getUser().getUserSeq());
+    followService.followUser(toUser, fromUser);
+    return ResponseEntity.status(HttpStatus.OK).body(toUser.getUserId() + " 님을 팔로우 하였습니다.");
+  }
+
+  // 언팔로우
+  @DeleteMapping("/follower")
+ public ResponseEntity<String> deleteFollowUser(@RequestBody @Valid FollowRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    User toUser = userService.findByUserSeq(requestDto.getToUserSeq());
+    User fromUser = userService.findByUserSeq(userDetails.getUser().getUserSeq());
+    followService.deleteFollowUser(toUser, fromUser);
+    return ResponseEntity.status(HttpStatus.OK).body(toUser.getUserId() + " 님을 팔로우취소 하였습니다.");
+  }
+
+  // 내가 팔로우한 사람들 조회
+  @GetMapping("/followers")
+  public ResponseEntity<List<FollowResponseDto>> getFollowings(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+    User user = userService.findByUserSeq(userDetails.getUser().getUserSeq());
+    List<FollowResponseDto> followers = followService.getFollowings(user);
+    return ResponseEntity.status(HttpStatus.OK).body(followers);
+  }
+}
+
+```
+코드 풀이 필요
+
+```java
+
+@Service
+@RequiredArgsConstructor
+public class FollowService {
+
+  private final FollowRepository followRepository;
+
+  @Transactional
+  public void followUser(User toUser, User fromUser) {
+    if(fromUser.getUserSeq().equals(toUser.getUserSeq())) {
+      throw new CustomException(ErrorCode.SAME_USER);
+    }
+    Optional<Follow> checkFollow = followRepository.findByFromUserAndToUser(fromUser, toUser);
+    if(checkFollow.isPresent()) {
+      throw new CustomException(ErrorCode.ALREADY_FOLLOW);
+    }
+    Follow follow = new Follow(fromUser, toUser);
+    followRepository.save(follow);
+  }
+
+  @Transactional
+  public void deleteFollowUser(User toUser, User fromUser) {
+    Optional<Follow> checkFollow = followRepository.findByFromUserAndToUser(fromUser, toUser);
+    if(checkFollow.isEmpty()) {
+      throw new CustomException(ErrorCode.RECENT_NOT_FOLLOW);
+    }
+    followRepository.delete(checkFollow.get());
+  }
+
+  @Transactional(readOnly = true)
+  public List<FollowResponseDto> getFollowings(User user) {
+    List<FollowResponseDto> followResponseDtoList = new ArrayList<>();
+    for(Follow follow : user.getFollowings()) {
+      followResponseDtoList.add(new FollowResponseDto(follow.getToUser()));
+    }
+    return followResponseDtoList;
+  }
+}
+
+```
+
+코드 풀이 필요
+
+```java
+
+@Getter
+@Entity
+@NoArgsConstructor
+public class Follow extends Timestamped {
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "follow_id")
+  private Long id;
+
+  @ManyToOne
+  @JoinColumn(name = "from_user")
+  private User fromUser;
+
+  @ManyToOne
+  @JoinColumn(name = "to_user")
+  private User toUser;
+
+  public Follow(User fromUser, User toUser){
+    this.fromUser = fromUser;
+    this.toUser =toUser;
+  }
+}
+
+
+```
+
+코드 풀이 필요
