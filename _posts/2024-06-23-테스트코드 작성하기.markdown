@@ -1,0 +1,22 @@
+---
+layout: post
+title:  "TIL(20240623) [아웃소싱 프로젝트: 단위테스트]"
+date:  2024-06-23
+categories: TIL Spring
+---
+
+---------------------------------------------------------------------
+
+# 📌 Spring
+
+## 💡 아웃소싱 프로젝트: 단위테스트
+
+```
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+```
+
+이 경고 메시지는 현재 사용 중인 Gradle 빌드에서 더 이상 지원되지 않을 기능들을 사용했음을 알려주는 것입니다. 이는 향후 Gradle 버전인 9.0과 호환되지 않을 수 있음을 의미합니다. 이 문제를 해결하기 위해 먼저 사용 중인 프로젝트의 Gradle 빌드 스크립트에서 사용된 Deprecated된 기능들을 식별하고 업데이트해야 합니다.
+
