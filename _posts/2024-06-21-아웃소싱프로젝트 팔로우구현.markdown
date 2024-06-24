@@ -45,11 +45,42 @@ public List<PublicPostResponseDto> getFollowedPosts(User user, int page, int pag
 
 ```
 
-내가 팔로우한 사람들의 게시물을 조회하는 부분에서 복잡해지는 것 같아
-정리가 안되어서 조금 고생했던 것 같다 🤣
-
 구현한 코드에 대해서 간단하게 설명을 해보자면 userService에서 user의 정보를 가져오고 currentUser가 팔로우한 모든 사용자를 가져온 다음 그 모든 사용자의 publicPost를 가져오고 최신순으로 페이지 처리를 한다. publicPosts가 0 이라면 예외를 날리고 아니라면 reponseDto에 객체에 publicPost를 담아서 반환한다.
 
+정말 간단한거 같지만 코드 구현하는데 엄청 머리가 터질뻔했다..ㅎㅎㅎ;;; 너무 복잡하고 일단 FromUser와 ToUser가 헷갈리기 시작하면서 Follwing과 Followers도 헷갈리고..
+
+어쨋든 정리하자면
+FromUser = "나"
+ToUser = "내가 팔로우한 사람"
+List<Following> = "내가 팔로우 한 사람들 리스트"
+List<Followers> = "나를 팔로우 한 사람들 리스트"
+
+
+```java
+if (publicPosts.getTotalElements() == 0) {
+        throw new CustomException(ErrorCode.POST_EMPTY);
+      }
+``` 
+그리고 위 부분에서 다른 포스트 전체조회에서는 되지만 나를 팔로우한 사람들의 게시물 전체조회에서는 예외처리가 되지않아 아래와 같이 수정하였다.
+
+```java
+if (publicPosts.isEmpty()) {
+        throw new CustomException(ErrorCode.POST_EMPTY);
+      }
+```
+추가로 controller 쪽에서 page처리
+
+```java
+
+@GetMapping("/followed")
+    public ResponseEntity<List<PublicPostResponseDto>> getFollowedPosts(
+      @AuthenticationPrincipal UserDetailsImpl userDetails, @RequestParam("page") int page, @RequestParam(value = "size", defaultValue = "5") int pageSize) {
+     return ResponseEntity.status(HttpStatus.OK)
+        .body(postService.getFollowedPosts(userDetails.getUser(), page - 1, pageSize));
+     }
+
+```
+이전에는 pagesize를 상수로 지정해놓는 형식으로 하였으나 나중에 추후에 유지보수측면에서 좋지 않을 것으로 판단되어 pageSize를 param으로 받을 수 있도록 했다. 그리고 pageSize를 별도로 넘겨주지 않을 경우 defaultvalue를 통해서 5로 지정해놓았다. (5개만 보이도록 지정해놓았다)
 
 ```java
 
@@ -133,7 +164,26 @@ public class FollowService {
 
 ```
 
-코드 풀이 필요
+팔로우한 사람들 조회 같은경우 user.getFollowings가 비어있는 경우 예외처리가 필요했으나
+하지 않으니...... 빈 리스트가 떴고, 
+
+```java
+@Transactional(readOnly = true)
+  public List<FollowResponseDto> getFollowings(User user) {
+    List<FollowResponseDto> followResponseDtoList = new ArrayList<>();
+    List<Follow> followings = user.getFollowings();
+    if (followings.isEmpty()) {
+      throw new CustomException(ErrorCode.EMPTY_FOLLOW);
+    }
+    for (Follow follow : followings) {
+      followResponseDtoList.add(new FollowResponseDto(follow.getToUser()));
+    }
+    return followResponseDtoList;
+  }
+```
+ErrorCode.EMPTY_FOLLOW 해당 에러코드를 만들어 exception처리했다. 정작 코드를 구현할 때는 생각도 못하다가
+뒤늦게 테스트를 할 때 이러한 부분을 깨닫곤 한다.
+아직 예외처리에 대한 경각심이 부족한게지.....😅
 
 ```java
 

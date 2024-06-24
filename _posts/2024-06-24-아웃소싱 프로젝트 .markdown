@@ -1,0 +1,39 @@
+---
+layout: post
+title:  "TIL(20240624) [아웃소싱 프로젝트: fix 팔로우]"
+date:  2024-06-23
+categories: TIL Spring
+---
+
+---------------------------------------------------------------------
+
+# 📌 Spring
+
+## 💡 아웃소싱 프로젝트: fix 팔로우 
+
+구현하고 제대로 테스트를 안해본 탓이다..
+
+```java
+
+public List<PublicPostResponseDto> getFollowedPosts(User user, int page, int pageSize) {
+    Pageable pageable = PageRequest.of(page, pageSize);
+
+    User currentUser = userService.findByUserSeq(user.getUserSeq());
+    List<Follow> follows = followRepository.findByFromUser(currentUser);
+
+    List<PublicPostResponseDto> publicPostResponseDtos = new ArrayList<>();
+    for (Follow followerList : follows) {
+      User followedUser = followerList.getToUser();
+      Page<PublicPost> publicPosts = postRepository.findByUserOrderByCreatedAtDesc(followedUser, pageable);
+      if (publicPosts.isEmpty()) {
+        throw new CustomException(ErrorCode.POST_EMPTY);
+      }
+      for(PublicPost publicPost : publicPosts) {
+        PublicPostResponseDto responseDto = new PublicPostResponseDto(publicPost);
+        publicPostResponseDtos.add(responseDto);
+      }
+    }
+    return publicPostResponseDtos;
+  }
+
+```
