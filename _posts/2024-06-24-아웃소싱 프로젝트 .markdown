@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "TIL(20240624) [아웃소싱 프로젝트: fix 팔로우]"
-date:  2024-06-23
+date:  2024-06-24
 categories: TIL Spring
 ---
 
