@@ -1,0 +1,43 @@
+---
+layout: post
+title:  "TIL(20240627) []"
+date:  2024-06-27
+categories: TIL QueryDSL
+---
+
+---------------------------------------------------------------------
+
+# 📌 QueryDSL
+- Spring boot JPA(ORM)에서 제공하는 인터페이스 형태의 쿼리 메소드를 사용해도 기본적인 쿼리를 하기에느 충분하지만 페이징 등 복잡한 쿼리를 작성해야되는 요구사항이 있을 경우에는 쿼리메서드를 사용하기에는 가독성이 떨어지며 어려운 로직이 작성 될 수 있다. 이러한 경우에 사용되는 것이 QueryDSL을 프로젝트에 적용하여 사용할 수 있다.
+
+```java
+
+// JpaRepository 예시 코드
+@Repository
+public interface MemberRepository extends JpaRepository<Member, UUID> {
+	boolean existsMemberByEmail(String email);
+}
+
+```
+
+```java
+
+// QueryDSL 적용 예시 코드
+@Repository
+@RequiredArgsConstructor
+public class MemberCustomRepositoryImpl implements MemberCustomRepository {
+    private final JPAQueryFactory query;
+    @Override
+    public boolean existsByMemberEmail(String email) {
+        return query.selectOne()
+                .from(member)
+                .where(member.email.eq(email))
+                .fetchFirst() != null;
+    }
+}
+
+```
+
+위의 JpaRepository interface에서 작성된 코드와 비교를 하면 QueryDSL로 작성된 코드는 SQL형식과 유사하다는 것을 알 수 있다.
+즉, SQL문을 작성할 수 있어야(이해도가 있어야) QueryDSL로도 어렵지 않게 작성할 수 있게 된다.
+
