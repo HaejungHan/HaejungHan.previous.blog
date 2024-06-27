@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "TIL(20240627) []"
+title:  "TIL(20240627) [QueryDSL]"
 date:  2024-06-27
 categories: TIL QueryDSL
 ---
