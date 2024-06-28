@@ -28,5 +28,45 @@ categories: TIL 기술면접
 
 -----------------------------------------------------------------
 
-# 📌 Q
+# 📌 QueryDSL 작성
 
+이전 아웃소싱 프로젝트에서 익명/비익명 게시판을 주제로 프로젝트를 구현했으므로 Post/PublicPost로 나뉘게 된다.
+
+과제 요구사항에 따라 추가해야 할 부분이 필요했는데, 프로젝트에서는 따로 게시물 조회시 responseDto에서 likeCount의 필드를 별도로 가지고 있지 않아 추가를 해주었고, likeCount의 경우 likeCount를 조회하는 쿼리문을 구현해주셔서 가져오는 형식으로 했다. 
+
+- **게시글 및 댓글 단건조회 응답에 좋아요 개수 추가**
+    - 게시글 단건 정보 조회시 게시글의 좋아요 개수필드를 추가합니다.
+    - 댓글 단건 정보 조회시 댓글의 좋아요 개수필드를 추가합니다.
+
+아래는 비익명게시판의 Dto이다.
+
+```java
+
+@Getter
+public class PublicPostResponseDto {
+    String title;
+    String content;
+    String userName;
+    LocalDateTime createdAt;
+    LocalDateTime modifiedAt;
+    int likeCount;
+
+    public PublicPostResponseDto(PublicPost post, int likeCount) {
+        this.title = post.getTitle();
+        this.content = post.getContent();
+        this.userName = post.getUser().getUserName();
+        this.createdAt = post.getCreatedAt();
+        this.modifiedAt = post.getModifiedAt();
+        this.likeCount = likeCount;
+    }
+
+    public PublicPostResponseDto(PublicPost post) {
+        this.title = post.getTitle();
+        this.content = post.getContent();
+        this.userName = post.getUser().getUserName();
+        this.createdAt = post.getCreatedAt();
+        this.modifiedAt = post.getModifiedAt();
+        this.likeCount = 0;
+    }
+
+```
