@@ -8,7 +8,10 @@ categories: TIL QueryDSL
 ---------------------------------------------------------------------
 
 # 📌 QueryDSL
-- Spring boot JPA(ORM)에서 제공하는 인터페이스 형태의 쿼리 메소드를 사용해도 기본적인 쿼리를 하기에느 충분하지만 페이징 등 복잡한 쿼리를 작성해야되는 요구사항이 있을 경우에는 쿼리메서드를 사용하기에는 가독성이 떨어지며 어려운 로직이 작성 될 수 있다. 이러한 경우에 사용되는 것이 QueryDSL을 프로젝트에 적용하여 사용할 수 있다.
+- Spring boot JPA(ORM)에서 제공하는 인터페이스 형태의 쿼리 메소드를 사용해도 기본적인 쿼리를 하기에는 충분하지만 페이징 등 복잡한 쿼리를 작성해야되는 요구사항이 있을 경우에는 쿼리메서드를 사용하기에는 가독성이 떨어지며 어려운 로직이 작성 될 수 있다. 이러한 경우에 사용되는 것이 QueryDSL을 프로젝트에 적용하여 사용할 수 있다.
+
+#### TMI)개인적 경험: 이전 프로젝트를 하면서 느꼈던 부분은 어떠한 기능에서 정렬 등 요구사항이 많아질수록 Jpa쿼리문도 길어지게 되었고 쿼리문을 CamelCase나 _등을 제대로 처리하지 않을 경우 계속 오류가 발생했다. (이전 프로젝트에서 고유키를 useSeq로 설정하여 userId와 헷갈리는 등 혼란을 겪었던 적이 있었다... ) 어쨌든 길어지면 길어질수록 헷갈리고 어떤 부분에서 명확하게 잘못되었는지 확인할 길이 없다. 
+
 
 ```java
 
@@ -38,6 +41,37 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
 
 ```
 
-위의 JpaRepository interface에서 작성된 코드와 비교를 하면 QueryDSL로 작성된 코드는 SQL형식과 유사하다는 것을 알 수 있다.
-즉, SQL문을 작성할 수 있어야(이해도가 있어야) QueryDSL로도 어렵지 않게 작성할 수 있게 된다.
+(이 정도는 사실 Jpa쿼리문만 사용해도 괜찮을 것 같지만..
+여기서 요구사항이 1개만 더 붙어도 길이가 2배가 되어버리는 매직을.. 이전 프로젝트를 진행하며 느낄 수 있었다.)
+
+위의 JpaRepository interface에서 작성된 코드와 비교를 하면 QueryDSL로 작성된 코드는 SQL형식과 유사하다는 것을 알 수 있다. 즉, SQL문/JPQL문을 작성할 수 있어야(이해도가 있어야) QueryDSL로도 어렵지 않게 작성할 수 있게 된다.
+
+(SELET, FROM, WHERE은 어느 순간 익숙해진 것 같다.)
+
+### 그렇다면 JPQL말고 왜 QueryDSL을 사용하는 것일까???
+- SQL과 JPQL의 문제점은 문자열로 쿼리문이 작성되기에 Type-check(컴파일시 에러체크가능)이 불가능하다. 그러니까 쿼리에 오류가 있을 시에는 어플리케이션을 실행 한 후에나 오류를 발견할 수 있다!
+반면에 QueryDSL은 코드로 작성하여 컴파일 시점에서 오류를 잡을 수 있다.
+- 그리고 복잡한 동적쿼리를 편리하게 작성할 수 있다. 
+
+그러면 본격적으로 QueryDSL을 작성해보려고 한다.
+먼저 설정방법에 대해서 알아보도록 하자
+
+QueryDSL을 사용하기 위해서 gradle에 의존성을 추가해준다.
+QueryDSL은 컴파일 단계에서 Entity 기반으로 Q클래스를 생성하는데, JPAAnnotationProcessor 가 컴파일 시점에 작동해서 @Entity 등등의 어노테이션을 찾아 해당 파일들을 분석해서 QClass를 만들어 주게된다.
+
+그리고 Entity 클래스와 매핑되는QClass를 기반으로 쿼리를 실행한다.
+
+```java
+
+// QueryDSL 적용을 위한 의존성 (SpringBoot3.0 부터는 jakarta 사용해야함)
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
+```
+
+Q클래스가 만들어졌는지 확인해보자!
+
+![image](https://private-user-images.githubusercontent.com/130989670/344007763-4599923f-a781-41bb-ae79-195b60709247.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MTk1NDE5MDMsIm5iZiI6MTcxOTU0MTYwMywicGF0aCI6Ii8xMzA5ODk2NzAvMzQ0MDA3NzYzLTQ1OTk5MjNmLWE3ODEtNDFiYi1hZTc5LTE5NWI2MDcwOTI0Ny5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjQwNjI4JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI0MDYyOFQwMjI2NDNaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT1jYzY4ZjUxOTMyOWEwMGIwY2ZjY2JjOWRkMGEzZWUwODE1ODIwZjU1YTYyOGEwYTkxYzEzMWVhMTA1ZGMxZTczJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCZhY3Rvcl9pZD0wJmtleV9pZD0wJnJlcG9faWQ9MCJ9.DeIpRICFMNfZ71gs4F_Inm_zqEc3tdNYZMec2T1ADuU)
 
