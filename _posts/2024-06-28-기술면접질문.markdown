@@ -19,11 +19,18 @@ categories: TIL 기술면접
 - 레이어별로 나누어서 Slice Test 를 하는 이유에 대해서 설명해주세요.<br>
 : 슬라이스 테스트는 실제 톰캣(어플리케이션 웹서버)을 실행시키지 않고 대상이 되는 계층에서 필요한 bean만 등록하여 테스트를 하기 때문에 속도가 빠르고, 특정계층의 기능에 집중하여 그 기능이 올바르게 작동하고 있는지 세밀하게 확인할 수 있어 레이어별로 나누어 슬라이스 테스트를 진행합니다.
 
+[통합테스트와 슬라이스테스트](https://hstory0208.tistory.com/entry/Spring-%ED%86%B5%ED%95%A9-%ED%85%8C%EC%8A%A4%ED%8A%B8%EC%99%80-%EC%8A%AC%EB%9D%BC%EC%9D%B4%EC%8A%A4-%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%B0%A8%EC%9D%B4-%EB%B0%8F-%EB%B9%84%EA%B5%90)
+
 - 테스트 코드를 직접 짰을 때, 느낀 테스트 코드 작성의 필요성을 설명해주세요.
 : 개인적인 경험에서 말씀드리면, 테스트 코드는 제가 작성한 코드가 안정성이 있는지 검증을 해주는 역할을 하고, 제가 직접 테스트 코드를 작성하면서 코드 대한 흐름을 명확히 되짚어보게 되어 리팩토링이 필요한지에 대해서도 재확인하게 되는 동기부여를 주는 것 같습니다. 
 
 - JPA와 Hibernate의 차이점은 무엇인가요?
 :JPA는 자바 어플리케이션에서 관계형 데이터베이스를 사용하는 방식을 정의한 인터페이스 입니다. 차이점이라고 하면, JAVA에서 JPA와 Hibernate의 관계를 보자면 interface와 interface를 실제로 구현한 class관계라고 볼 수 있습니다. 
+
+[JPA개념정리](https://www.devjoon.com/61) <br>
+[JPA차이점](https://suhwan.dev/2019/02/24/jpa-vs-hibernate-vs-spring-data-jpa/) <br>
+[JPA와 Spring data JPA](https://lealea.tistory.com/238) 
+
 
 ```java
 ** Spring data JPA -> Repository와 같은 개념 실제 구현체 X (interface)
