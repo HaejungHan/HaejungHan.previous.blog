@@ -1,0 +1,9 @@
+---
+layout: post
+title:  "TIL(20240629) [QueryDSL]"
+date:  2024-06-29
+categories: TIL QueryDSL JPA
+---
+
+---------------------------------------------------------------------
+
