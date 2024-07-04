@@ -39,7 +39,7 @@ categories: TIL Spring 알고리즘 코딩테스트
 
 해당 패키지 아래에 보면 어플리케이션이 있는데,
 
-![alt text](image-5.png)
+![image](https://github.com/HaejungHan/HaejungHan.github.io/assets/130989670/2f12584d-bca0-47c4-9d7f-45b59ff1fed3)
 
 어플리케이션 안에 @ComponentScan이 있기 때문에 
 패키지 내에서 @Controller 애너테이션을 달아주면
