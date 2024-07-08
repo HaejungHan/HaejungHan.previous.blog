@@ -45,6 +45,111 @@ Operate: 서비스 현황을 파악하고 생길 수 있는 문제를 감지
 - 여러 어플리케이션의 독립성과 확장성이 높아진다.
 
 
-### docker 설치
+### ✨ docker 설치
 
-Win + X : powershell(관리자) 실행
+단축키 **Win + X : powershell(관리자)**
+
+도커를 설치하는데 험난한 여정이 되었다...........
+WSL을 설치하기 위해서 powershell에서 아래 명령어를 작성하니
+
+저의 컴퓨터는 Window10입니다😅 (ㅠㅠ꼬물..)
+
+1. WSL2 설치를 위한 사전준비
+
+![image](https://github.com/HaejungHan/HaejungHan.github.io/assets/130989670/3f47b842-ccb0-4c57-a0f0-409f7fe12348)
+
+나는 여기서 Hyper_V까지 체크해주었다. 뭔가 제대로 설치가 안되어서 찾아보니 Hyper-V 하위에서 Hyper-V플랫폼이 회색으로 되어있었다. (내가 설정할 수 없다라는 의미 같았다.)
+
+2. WSL2설치
+
+```
+wsl --install
+
+dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
+
+wsl --update
+```
+
+해당 명령어를 입력했으나
+
+```
+wsl --update
+```
+오류입니다!!!!!!
+
+![image](https://github.com/HaejungHan/HaejungHan.github.io/assets/130989670/ab41cc64-b050-40ec-993b-7f57c39739f0)
+
+찾아보니 --web-download를 붙여줘야 한다는것?을 알게되었고,
+그래도 설치가 원활히 되지 않아 더 찾아보니
+
+작업관리자 -> 성능 -> 가상화 : 사용안함이라고 설정되어있었음
+
+CPU 가상화를 활성화 시켜주어야 했는데, 이는 바이오스에 진입해서 설정을 해주어야 한다는 것을 알게되었다.
+
+```
+**바이오스: 사용자가 PC를 켜면 시작되는 프로그램으로 컴퓨터의 입출력을 처리하는 펌웨어
+```
+
+아래 링크를 참고하여 SVM Mode -> Enabled로 변경했다.
+ㅎ
+제조사 마다 advancdeMode가 달라 처음에는 당황했으나 어찌저찌 찾다보면.. 나오더라 나는 advanced에서 CPU어쩌고저쩌고가 있어서 들어가보니 SVM mode가 disabled로 되어있는 것을 확인!
+그리고 변경해주었다. 
+
+[CPU 가상화 활성화 방법](https://jih0.medium.com/amd-cpu-%EA%B0%80%EC%83%81%ED%99%94-%EB%B0%8F-windows-10-wsl-2-docker-desktop-%EC%84%A4%EC%B9%98-beb2b7a09397)
+
+그리고 다시 작업관리자에 들어가서 확인해보니 
+
+![image](https://github.com/HaejungHan/HaejungHan.github.io/assets/130989670/bd1353ac-a94a-406c-aa90-1d79b9c4415f)
+
+요렇게 변경되어있음을 확인했다!!!!!
+
+다시 powershell로 들어가서
+
+```
+wsl --install--web-download-d Ubuntu
+```
+
+정상적으로 설치되었다!
+
+![image](https://github.com/HaejungHan/HaejungHan.github.io/assets/130989670/ddcfe94d-f946-4315-b5ed-256376e03175)
+
+그리고 아래 순서에 따라 명령어를 치고 다운로드를 진행하면 된다!
+
+```
+
+# docker engine gpg 키 등록
+sudo apt-get update
+sudo apt-get install ca-certificates curl gnupg
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+# apt source 에 docker 관련 추가
+echo \
+  "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+
+# docker engine 설치
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io \
+docker-buildx-plugin docker-compose-plugin docker-compose
+
+# docker 그룹에 현재 계정을 등록하여 sudo 없이 docker 명령을 사용하게 함
+sudo usermod -aG docker user
+sudo service docker restart
+
+# 새로운 터미널을 열고 확인
+docker version
+
+```
+
+```
+# docker version 확인
+docker --version
+
+# docker compose version 확인
+docker-compose --version
+```
+
+이제 docker desktop 설치하러 가야지!
