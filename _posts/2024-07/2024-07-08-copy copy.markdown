@@ -1,7 +1,7 @@
 ---
 layout: post
-title:  "TIL(20240707) [AWS실습]"
-date:  2024-07-07
+title:  "TIL(20240708) [AWS실습]"
+date:  2024-07-08
 categories: TIL AWS실습
 ---
 

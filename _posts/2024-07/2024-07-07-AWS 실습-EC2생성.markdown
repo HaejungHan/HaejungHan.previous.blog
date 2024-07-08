@@ -1,0 +1,42 @@
+---
+layout: post
+title:  "TIL(20240707) [AWS실습, AMI와 EBS]"
+date:  2024-07-07
+categories: TIL AWS실습
+---
+
+----------------------------------------------------------------------------
+
+AWS 계정생성 후 로그인(root사용자)! -> ✨항상 region 확인할 것
+
+## 💡 인스턴스 생성
+
+connet
+
+```
+ls
+sudo apt-get update
+sudo apt-get install nginx
+y
+sudo systemctl start nginx
+sudo systemctl status nginx
+```
+
+
+```
+//html 내용 수정해보기
+cd /var/www/html
+ls
+sudo vim index.nginx-debian.html
+```
+
+![image](https://github.com/HaejungHan/HaejungHan.github.io/assets/130989670/3e89ddf5-b70a-4ead-82b8-4d4c09930553)
+
+### 🚩 AMI와 EBS 차이?
+
+- EBS는 EC2 인스턴스에서 사용되는 스토리지 볼륨이다. 이 볼륨은 인스턴스에 연결되어 인스턴스에 데이터를 저장하고 보존하는데 사용된다. EBS는 인스턴스를 종료해도 저장된 데이터를 보존한다.
+- AMI는 EC2 인스턴스를 시작할 때 사용되는 이미지이다. AMI는 이미 설치된 운영체제와 어플리케이션을 포함하여 인스턴스를 구성하는데 필요한 모든 정보를 포함한다. 이를 통해 AMI를 사용하여 손쉽게 EC2 인스턴스를 시작하고, 중지하고, 삭제, 복제, 복원을 할 수 있게 된다. (AMI는 설치CD개념)
+
+- 정리: AMI는 EC2인스턴스를 시작할 때 사용하는 이미지, EBS는 인스턴스에 연결되어 데이터를 저장하고 보존하는데 사용되는 스토리지 볼륨이다. AMI를 생성하는 데 EBS스냅샷을 사용할 수 있다.
+(쉽게 이해하기: AMI는 EC2를 시작하기 위한 설치CD, EBS는 사용하고 있는 EC2를 백업하기 위한 것) 둘 다 백업의 개념
+
