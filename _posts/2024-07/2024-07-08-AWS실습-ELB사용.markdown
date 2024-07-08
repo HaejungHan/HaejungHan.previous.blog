@@ -16,5 +16,5 @@ categories: TIL AWS실습
     5) 고가용성 제공
     6) 공개 트래픽과 내부 트래픽 분리
 
-
+![image](https://github.com/HaejungHan/HaejungHan.github.io/assets/130989670/df4c91e8-49e2-4e4d-9794-5801bf26a1c4)
 
