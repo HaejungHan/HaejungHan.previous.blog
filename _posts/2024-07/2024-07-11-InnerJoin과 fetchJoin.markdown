@@ -1,8 +1,8 @@
 ---
 layout: post
-title:  "TIL(20240711) [Trello프로젝트-카드 기능 구현]"
+title:  "TIL(20240711) [InnerJoin과 fetchJoin]"
 date:  2024-07-11
-categories: TIL Spring CRUD
+categories: TIL SQL
 ---
 
 ----------------------------------------------------------------------------
