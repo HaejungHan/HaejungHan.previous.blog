@@ -1,0 +1,86 @@
+---
+layout: post
+title:  "TIL(20240713) [프론트 연결 및 구현 :카드 수정/삭제/댓글 생성]"
+date:  2024-07-13
+categories: TIL thymeleaf
+---
+
+----------------------------------------------------------------------------
+
+
+카드 수정전 
+![image](https://github.com/user-attachments/assets/a8992e91-948f-4cc1-bff3-36fae9f33735)
+
+카드 수정 모달창
+![image](https://github.com/user-attachments/assets/d9cc6908-4ff3-472c-9075-328e32cdbd7d)
+
+카드 수정 후
+![image](https://github.com/user-attachments/assets/33e3c01e-c8cd-4388-918f-8359fc6139ce)
+
+댓글 추가전
+![image](https://github.com/user-attachments/assets/fdcb282c-4a77-448a-a259-0325362f3c20)
+
+댓글 추가후
+![image](https://github.com/user-attachments/assets/d8a873f2-2ff4-4095-9bf0-7e2680130238)
+
+댓글 삭제
+![image](https://github.com/user-attachments/assets/843165a8-d9ab-4873-b59c-8002c4b18b88)
+
+
+```
+
+.then(comments => {
+
+  const commentsContainer = document.getElementById('commentsContainer');
+  comments.forEach(comment => {
+    const newComment = document.createElement('div');
+    newComment.className = 'comment';
+    newComment.innerHTML = `
+      <div class="comment-content">${comment.message}</div>
+      <div class="comment-createdAt">${comment.createdAt}</div>
+    `;
+    commentsContainer.appendChild(newComment);
+  });
+})
+.catch(error => {
+  console.error('Error fetching or processing comments:', error);
+  // Handle error gracefully, e.g., display a message to the user
+});
+
+```
+
+타임리프를 사용해서 html 구현한 댓글 조회부분인데
+계속 해서 콘솔에 
+
+```
+Error: Expected an array of comments, but received something else
+```
+
+해당 에러가 떴고, 컨트롤러 쪽에서 응답형식을 바꾸고 나서 해당 에러가 발생한다는 것을 알게 되었다.
+
+그래서 다시 반환 형식에 맞춰서
+
+```
+.then(data => {
+    console.log(data); 
+    const comments = data.data; 
+
+    const commentsContainer = document.getElementById('commentsContainer');
+    comments.forEach(comment => {
+      const newComment = document.createElement('div');
+      newComment.className = 'comment';
+      newComment.innerHTML = `
+        <div class="comment-content">${comment.message}</div>
+        <div class="comment-createdAt">${comment.createdAt}</div>
+      `;
+      commentsContainer.appendChild(newComment);
+    });
+  })
+  .catch(error => {
+    console.error('Error fetching or parsing comments:', error);
+    // Handle errors appropriately
+  });
+```
+
+const comments = data.data; 해당부분을 추가해주었다.
+..........................ㅎㅎㅎㅎㅎㅎ
