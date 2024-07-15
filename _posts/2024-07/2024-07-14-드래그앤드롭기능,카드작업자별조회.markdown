@@ -82,12 +82,17 @@ controller
 
 ```
 
+유저를 넣고나서 테스트를 하는 과정에서 에러가 발생했는데,
+dto 생성자를 만드는 과정에서 뭔가 문제가 있는 듯 했다.
+
 ```
 {
     "msg": "No constructor found for class com.sparta.trello.comment.dto.CommentResponseDto with parameters: [class com.sparta.trello.comment.entity.Comment]",
     "statuscode": 400
 }
 ```
+
+위와 같은 에러를 해결하기 위해서 찾아보니! 유저를 넣고 나서 유저의 매개변수를 넣어주지 않았던것! 
 
 이전
 
