@@ -1,0 +1,46 @@
+---
+layout: post
+title:  "TIL(20240717) [카드 순서이동 기능-테스트코드 작성하기]"
+date:  2024-07-17
+categories: TIL Spring
+---
+
+----------------------------------------------------------------------------
+
+
+```
+@Transactional
+  public void moveCardToPosition(Long cardId, int newPosition, Long userId) {
+    User user = userRepository.findById(userId).orElseThrow(()-> new CustomException(ErrorEnum.USER_NOT_AUTHENTICATED));
+    Card card = findCardById(cardId);
+    card.checkUser(user);
+    Columns column = card.getColumns();
+    int currentPosition = card.getPosition();
+
+    List<Card> cards = cardRepository.findByColumnIdOrderByPositionAsc(column.getId());
+
+    if (newPosition < 0 || newPosition >= cards.size()) {
+      throw new CustomException(ErrorEnum.WRONG_POSITION_NUMBER);
+    }
+
+    if(currentPosition < newPosition) { // current 3  newPosition 4
+      for(Card c : cards) { // 4 , 5
+        if (c.getPosition() > currentPosition && c.getPosition() <= newPosition) {
+          c.setPosition(c.getPosition() - 1);
+          cardRepository.save(c);
+        }
+      }
+    } else {
+      for(Card c : cards) {
+        if(c.getPosition() >= newPosition && c.getPosition() < currentPosition) {
+          c.setPosition(c.getPosition() + 1);
+          cardRepository.save(c);
+        }
+      }
+    }
+    updateCardPosition(cardId, newPosition);
+    reorderCards(column.getId());
+  }
+```
+
+단위테스트, 통합테스트 진행하기

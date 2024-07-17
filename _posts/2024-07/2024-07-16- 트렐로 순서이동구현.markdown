@@ -1,14 +1,14 @@
 ---
 layout: post
-title:  "TIL(20240717) [트렐로 프로젝트 - 카드의 순서이동 구현]"
-date:  2024-07-17
+title:  "TIL(20240716) [트렐로프로젝트- 카드순서이동 구현]"
+date:  2024-07-16
 categories: TIL Spring
 ---
 
 ----------------------------------------------------------------------------
 
 
-```
+```java
 @Transactional
   public void moveCardToPosition(Long cardId, int newPosition, Long userId) {
     User user = userRepository.findById(userId).orElseThrow(()-> new CustomException(ErrorEnum.USER_NOT_AUTHENTICATED));
@@ -41,6 +41,7 @@ categories: TIL Spring
     updateCardPosition(cardId, newPosition);
     reorderCards(column.getId());
   }
+
 ```
 
-순서이동 구현 코드 풀이 필요
+순서이동 기능 코드 풀이 필요
