@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "TIL(20240711) [InnerJoin과 fetchJoin]"
+title:  "TIL(20240711) [InnerJoin과 fetchJoin, Transactional Read only?]"
 date:  2024-07-11
 categories: TIL SQL
 ---
@@ -32,4 +32,14 @@ CI/CD에 최적화?되어있는 microSevice 아키텍쳐
 - 아키텍쳐에서 그 차이점이 나뉜다.
 ![image](https://github.com/HaejungHan/HaejungHan.github.io/assets/130989670/4cce535e-a30a-4964-834e-5f10b0e07f4f)
 
-transactional readOnly = true 공부할것
+
+오늘 공부 내용이 조금 뒤죽박죽이긴 하지만 평소에 공부해보고 싶었고 개념이 흐렸던 부분에 대해서 메모했던 부분들에 대해서
+공부를 해보았다. 그러던 체크를 하던 와중에 갑자기 생각난 부분이 @transactional readOnly = true 였다.
+
+
+## 💡 @transactional readOnly = true
+- 데이터베이스 트랜잭션에 사용되는 옵션
+- 트랜잭션내에서 데이터를 **읽기전용**으로만 사용하겠다라는 의미
+- 즉, 데이터를 변경하지 않고 조회만 할 필요가 있을 때 해당 옵션을 사용한다. (getmapping)
+- 해당 옵션을 사용할 경우 읽기 전용 작업에 대해 성능을 최적화 할 수 있다.(왜냐하면 읽기전용 트랙잭션을 위해 필요한 추가적인 로그 기록이나 동기화 작업을 수행하지 않아도 되기 때문에)
+-
