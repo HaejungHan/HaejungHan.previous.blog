@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "TIL(20240720) [선택과 집중]"
+title:  "TIL(20240720) [AWS S3]"
 date:  2024-07-20
 categories: TIL 
 ---
@@ -14,7 +14,7 @@ categories: TIL
 이번 프로젝트를 통해서 내가 꼭 도전하고 싶었던 것<br>
 1) S3를 이용한 이미지 업로드기능
 2) QueryDSL을 이용해서 동적쿼리 사용
-3) QAuth로그인
+3) OAuth로그인
 4) 백오피스API
 5) 자바스크립트
 6) CI/CD
@@ -132,7 +132,8 @@ public PutObjectRequest(String bucketName, String key, InputStream input,
 - input : InputStream
 - metadata : 메타데이터
 
-[비지니스로직을 적용한 실습](https://growth-coder.tistory.com/116)
+[실습예제](https://velog.io/@chaeri93/SpringBoot-AWS-S3%EB%A1%9C-%EC%9D%B4%EB%AF%B8%EC%A7%80-%EC%97%85%EB%A1%9C%EB%93%9C%ED%95%98%EA%B8%B0)
 
+[비지니스로직을 적용한 실습](https://growth-coder.tistory.com/116)
 
 [이미지 업로드 비지니스 로직 참고자료](https://growth-coder.tistory.com/104)
