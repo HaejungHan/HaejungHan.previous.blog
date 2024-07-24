@@ -1,13 +1,14 @@
 ---
 layout: post
-title:  "TIL(20240723) [TCP/UDP와 http, https]"
-date:  2024-07-23
+title:  "TIL(20240724) [TCP/UDP와 http, https]"
+date:  2024-07-24
 categories: TIL 
 ---
 
 ----------------------------------------------------------------------------
 
-기술면접 7,8,9,10 제출하기
+- 기술면접 7,8,9,10 제출하기
+- 튜터님 면담 기술면접 준비
 
 9. TCP/UDP에 대해서 설명해주세요.
 
@@ -86,7 +87,6 @@ UDP는 데이터를 테이터그램 단위로 처리하는 프로토콜로, 비�
 
 String imageUrl= amazonS3Client.getResourceUrl(BUCKET, image.getOriginalFilename());
 ```
-
 
 11. DI, IoC에 대해 설명해주세요. 
 
