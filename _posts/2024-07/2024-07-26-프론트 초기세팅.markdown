@@ -66,5 +66,46 @@ vue create 디렉토리명
 
 선택
 
+서버개발중인 디렉토리에서 vue.js를 설치하려고 하는데
+갑자기 되지 않는다.. ㅠ_ㅠ
 
+```
+$ npm install -g @vue/cli
+bash: npm: command not found
+```
 
+계속 찾지 못한다..
+
+Git Bash의 환경 변수 설정 파일을 수정하여 Node.js와 npm의 경로를 추가해야 한다.
+
+git bash 창에서
+
+```
+nano ~/.bashrc  # 또는 ~/.bash_profile
+```
+
+```
+export PATH=$PATH:/c/Program\ Files/nodejs
+```
+
+뭐시기뭐시기 뜨면 yes를 해준다..ㅎㅎ;; 
+
+변경사항 적용을 위해
+
+```
+source ~/.bashrc  # 또는 ~/.bash_profile
+```
+
+![image](https://github.com/user-attachments/assets/68711d3e-a449-4687-8dc5-cfec9636f3ed)
+
+된다.. 😂
+
+다시 vue CLI 설치!
+
+![image](https://github.com/user-attachments/assets/cfeb7f86-fe93-4b91-8763-67558af5bceb)
+
+명령어 입력!
+
+![image](https://github.com/user-attachments/assets/f387150f-1f65-4496-8c2d-b7fe6208aedf)
+
+http://localhost:8080/ 접속시에 위 vuejs 초기화면이 뜬다!
