@@ -109,3 +109,40 @@ source ~/.bashrc  # 또는 ~/.bash_profile
 ![image](https://github.com/user-attachments/assets/f387150f-1f65-4496-8c2d-b7fe6208aedf)
 
 http://localhost:8080/ 접속시에 위 vuejs 초기화면이 뜬다!
+
+## 📌 서버와 Vue.js 연동
+
+```
+npm install axios
+npm install cors
+npm install vite --save-devcd
+npm install vue-router
+```
+
+서버와 프론트가 연결이 된 것 같은데.. 아직 더 공부가 필요할 듯 하다.
+
+어플리케이션을 실행해보면 
+
+```
+baseUrl: 'http://localhost:8081',
+frontUrl: 'http://localhost:8080
+```
+
+약간 서버포트가 바뀐 이슈가 있는데.. 서버 포트를 8080으로 바꿔야겠따.
+
+```
+Web server failed to start. Port 8080 was already in use.
+```
+
+cmd 창(관리자권한)
+
+```
+netstat -a -o
+taskkill /f /pid pid번호
+```
+8080포트에서 사용하는 pid번호를 입력해 종료시켜준다.
+
+[cmd 포트](https://blog.naver.com/jed00/140188732903)
+
+
+
