@@ -1,0 +1,70 @@
+---
+layout: post
+title:  "TIL(20240726) [프론트 초기세팅 Vue.js]"
+date:  2024-07-26
+categories: TIL Vue.js
+---
+
+----------------------------------------------------------------------------
+
+## 📌 프론트 초기세팅 - Vue.js
+
+1. node,npm을 설치
+- 아래 사이트로 이동하여 다운로드! 
+
+[node.js설치](https://nodejs.org/en/)
+
+2. 설치 후 cmd 창에서 아래 사항을 확인한다.
+![image](https://github.com/user-attachments/assets/0cedd1c8-e2ff-4c8f-b934-7f5856f507e7)
+
+3. 인텔리제이에서 newproject 생성 후 아래와 같은 설정을 해준다.
+![image](https://github.com/user-attachments/assets/67f923ba-c991-4dfc-b1ce-7aac6b05678c)
+
+4. 터미널 창에서 확인! 
+![image](https://github.com/user-attachments/assets/031203fa-ebfd-4527-9b6d-106709effa74)
+
+```
+**혹시나 마지막에 " Use https://registry.npm.taobao.org for faster installation? (Y/n)"이 나오면 Y를 입력한다.
+```
+
+5. 실행
+(vue.js 개발환경은 node js server임. npm은 node package manager의 줄임말로 node js를 설치하면 같이 설치된다.)
+
+![image](https://github.com/user-attachments/assets/b5f6621c-8f13-46d7-8850-5152ac135869)
+
+6. 터미널 창에서 아래 사항을 확인하고 
+![image](https://github.com/user-attachments/assets/72ef26a1-4908-47da-8568-e44aab19771d)
+
+7. 브라우저에서 http://localhost:8080/ 접속
+
+![image](https://github.com/user-attachments/assets/2b89bb40-3067-47a6-8b74-58181f28ef49)
+
+해당화면이 뜨면 완료!
+
+
+## 📌 Vue.js 기본 문법 알아보기
+
+[Vue.js](https://ko.vuejs.org/guide/introduction)
+
+
+## 📌 인텔리제이 - ui와 server 디렉토리 분리
+
+1. 터미널 창에서
+
+```
+npm install -g @vue/cli
+```
+
+```
+vue create 디렉토리명
+```
+
+? Please pick a preset: (Use arrow keys)
+> Default ([Vue 3] babel, eslint)
+  Default ([Vue 2] babel, eslint)
+  Manually select features
+
+선택
+
+
+
