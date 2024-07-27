@@ -1,0 +1,75 @@
+---
+layout: post
+title:  "TIL(20240727) [프론트와 백엔드 렌더링 CSR]"
+date:  2024-07-27
+categories: TIL Vue.js
+---
+
+----------------------------------------------------------------------------
+
+## 📌 프론트 초기세팅 - Vue.js
+
+어제 겪었던 문제들을 풀어보려고 한다. vue.js에 대한 이해도가 없기 때문에 계속해서 어떤 문제의 원인을 찾아내지 못하고 짐작만 하며 수정하기 급급했다.
+
+구글링을 찾아보니 반복적으로 일어나는 문제들은 해결할 수 있는 것 같다. 
+
+[vue.js와 spring 연동](https://gkawjdgml.tistory.com/162)
+
+
+먼저 해주었던 건 서버포트와 프론트포트의 혼란
+
+package.json 에서 scripts 부분을 아래와 같이 수정했다.
+
+```
+"scripts": {
+    "serve": "vue-cli-service serve --port 8081",
+    "build": "vue-cli-service build --watch",
+    "lint": "vue-cli-service lint"
+  }
+```
+
+프론트 포트는 8081이야 라고 하는 셈이다.
+
+두 번째 vue.config.js에서 아래와 같이 설정했다.
+```
+  outputDir: '../src/main/resources/static',
+
+  // npm run serve 개발 진행시에 포트가 다르기때문에 프록시 설정
+  devServer: {
+    proxy: 'http://localhost:8080' //서버 프로젝트 포트번호와 동일할 것
+  },
+
+```
+
+나는 csr방식으로 처리할 것이며 서버포트는 8080이니까 혼돈하지마!라는 설정..?
+
+```
+CSR vs SSR
+
+- CSR 방식에서는 Vue.js 애플리케이션의 모든 빌드 파일이 클라이언트 측에서 처리됩니다. 따라서 outputDir 설정을 사용하여 빌드된 파일들을 정적 자원 폴더(예: 웹 서버의 정적 파일 제공 폴더)에 위치시킬 수 있습니다. 이는 클라이언트가 페이지를 요청할 때 서버가 이 정적 파일들을 제공할 수 있도록 해줍니다.
+
+- 반면에 SSR (Server-Side Rendering) 방식에서는 Vue.js 애플리케이션의 초기 렌더링이 서버에서 처리되며, 그 후에 클라이언트 측에서 상호작용과 라우팅을 처리합니다. SSR에서는 서버 측에서 생성된 동적 콘텐츠를 클라이언트에 전달하기 위해 더 복잡한 설정이 필요할 수 있습니다.
+```
+
+
+```
+'vue-cli-service'은(는) 내부 또는 외부 명령, 실행할 수 있는 프로그램, 또는
+배치 파일이 아닙니다.
+
+```
+
+다시 에러..
+
+```
+npm uninstall vue-cil -g
+npm install -g @vue/cli
+```
+
+재설치 -> 에러
+
+node_module 폴더 삭제 후 재설치
+
+```
+npm i 
+```
+
