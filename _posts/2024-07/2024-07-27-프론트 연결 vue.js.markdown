@@ -73,3 +73,56 @@ node_module 폴더 삭제 후 재설치
 npm i 
 ```
 
+프론트를 변경할 때 마다 npm run serve를 해줘야 하는건가..?
+화면 이동 부분이 계속 바뀌지 않아서 헤매고 있다.
+도저히 감이 안잡히는 이 세계는 도대체 어떻게 해야할까..
+
+
+```
+93 vulnerabilities (1 low, 51 moderate, 36 high, 5 critical)
+
+```
+
+취약점: 총 93개 (1개는 낮음, 51개는 중간, 36개는 높음, 5개는 심각)
+
+what..?ㅎㅎㅎㅎ
+
+```
+  npm audit fix --force
+```
+
+블로그에 찾아보니 작동에 문제가 없으면 건드리지 않는게 좋다고 하지만 작동에 문제가 있는건지 내가 못하고 있는건지.. ㅠ_ㅠ
+정말 눙물이 나려고 한다...ㅠ_ㅠ_ㅠ
+지금까지 내가 느낀건.. vue.js는 너무 자유로운 것 같은 느낌이다.
+5-6시간째 씨름중이지만 절대 풀리지 않을 것 같고, 블로그 자료도 충분치 않아 너무 어렵다... 
+
+
+```
+npm warn ERESOLVE overriding peer dependency
+npm warn While resolving: bod-front@0.1.0
+npm warn Found: vue-template-compiler@2.7.16
+npm warn node_modules/vue-template-compiler
+npm warn   peer vue-template-compiler@"^2.0.0" from @vue/cli-service@3.12.1
+npm warn   node_modules/@vue/cli-service
+npm warn     dev @vue/cli-service@"^3.3.1" from the root project
+npm warn   1 more (the root project)
+npm warn
+npm warn Could not resolve dependency:
+npm warn peer vue-template-compiler@"^2.0.0" from @vue/cli-service@3.12.1
+npm warn node_modules/@vue/cli-service
+npm warn   dev @vue/cli-service@"^3.3.1" from the root project
+npm error code ETARGET
+npm error notarget No matching version found for vue-template-compiler@^3.4.34.
+npm error notarget In most cases you or one of your dependencies are requesting
+npm error notarget a package version that doesn't exist.
+npm error A complete log of this run can be found in: C:\Users\linkl\AppData\Local\npm-cache\_logs\2024-07-27T14_25_54_124Z-debug-0.log
+
+```
+
+버전오류 라고 해서
+
+```
+npm install @vue/cli-service@latest
+```
+
+재설치 정상작동...
