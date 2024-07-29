@@ -1,0 +1,64 @@
+---
+layout: post
+title:  "TIL(20240729) [vue.js와 백엔드 렌더링(CSR)]"
+date:  2024-07-29
+categories: TIL Vue.js
+---
+
+----------------------------------------------------------------------------
+
+프론트와 백엔드 렌더링 과정에서 
+
+```
+Access to XMLHttpRequest at 'http://localhost:8080/api/challenges?page=1' from origin 'http://localhost:8082' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+```
+
+Cors이슈 발생
+
+```java
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+
+  @Override
+  public void addCorsMappings(CorsRegistry registry) {
+	registry.addMapping("/**")
+		.allowedOrigins("http://localhost:8081")
+		.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+		.allowCredentials(true)
+		.maxAge(3600);
+  }
+
+
+  @Override
+  public void addResourceHandlers(ResourceHandlerRegistry registry) {
+	registry.addResourceHandler("/**")
+		.addResourceLocations("classpath:/META-INF/resources/")
+		.setCacheControl(CacheControl.noStore())
+		.setCachePeriod(0);
+  }
+}
+
+```
+
+백엔드쪽에 config생성
+
+이전에는 securityConfig부분에 넣었는데 헷갈리는 것 같아
+클래스를 하나 더 생성해서 구분해주었다.
+
+챌린지 메인페이지에 전체조회 API 연결
+
+![image](https://github.com/user-attachments/assets/1a513066-c7bb-4b8c-876a-89fdb0d823f7)
+![image](https://github.com/user-attachments/assets/6d77e08e-ec65-4960-bc38-1bd9aefd84b1)
+
+아직 챌린지 생성시 이미지를 넣을지에 대한 의논이 필요한데, 해당 부분을 내일 꼭 이야기를 해보아야 할 것 같다. 
+
+챌린지 단건 상세조회 및 최근 인증목록 조회 두가지 API를 연결했다.
+
+![image](https://github.com/user-attachments/assets/ed7983a0-9d55-4580-bc97-4bc0cc99e9cd)
+
+
+처음에는 vue.js구조가 어떻게 되는지 몰라서 정말 헤맸다.
+이틀을 꼬박 vue.js에 대해서 알아가는데 시간을 투자했다. 구조를 알고나니 감을 잡은건지 뚝딱 하나하나씩 만들어가는 내 모습을 보면서 안도했다.
+
+사실 6시간 전만에도 나는 지옥에 있던 기분이었다..😂
+
