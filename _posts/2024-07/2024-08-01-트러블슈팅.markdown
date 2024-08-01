@@ -146,3 +146,114 @@ catch (error) {
 
 
 ## 🔒 문제발생 : 프론트에서 페이지 처리 안되는 상황 발생
+
+컨트롤러 쪽
+
+```java
+ @GetMapping
+  public ResponseEntity<CommonResponseDto<List<ChallengeSummaryResponseDto>>> getAllChallenge(
+	  @RequestParam(value = "page", defaultValue = "1") int page
+  ) {
+	List<ChallengeSummaryResponseDto> challengeList = challengeService.getAllChallenges(
+		page - 1);
+	return ResponseEntity.ok().body(new CommonResponseDto<>
+		(HttpStatus.OK.value(), "챌린지 전체 조회 성공", challengeList));
+  }
+```
+
+레포지토리 임플쪽
+
+```java
+ public List<ChallengeSummaryResponseDto> getChallengeList(int page) {
+	QChallenge challenge = QChallenge.challenge;
+	Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+
+	List<ChallengeSummaryResponseDto> challengeList = queryFactory
+		.select(Projections.constructor(ChallengeSummaryResponseDto.class, challenge))
+		.from(challenge)
+		.orderBy(challenge.createdAt.desc())
+		.offset(pageable.getOffset())
+		.limit(pageable.getPageSize())
+		.fetch();
+	return challengeList;
+  }
+```
+
+도대체 나는 무엇을 페이지 처리하였는가...?
+이 코드를 막상 프론트랑 연결하려고 하니 프론트가 당연히 알 수가 없지 .. 해당 데이터가 얼마인지 알 수가 없는딩...
+구지 QueryDSL로 한 이유도 지금 생각해보니 왜그랬는가 싶다..전체조회면 findAll로 가져와도 될텐데,
+
+QueryDSL이 직관적으로 어떻게 데이터를 가져올지에 대해서 잘 보이기 때문에 익숙해져 그런거 같다.
+하지만 JPA쿼리랑 상황에 맞게 적절히 잘 사용하도록 노력해야겠다.
+
+현재 코드를 리팩토링 하니 N+1문제는 발생하지 않는 것 같다 하나의 쿼리문만 나가는 상태
+
+![image](https://github.com/user-attachments/assets/59ff19c2-ef3c-498f-933f-cae2afe04822)
+![image](https://github.com/user-attachments/assets/0e7f1709-dd42-47c6-8fdc-1f583b4b663d)
+
+
+그런데 가만히 밑에 들여다보니 이 것이 무엇인고..?
+
+
+```
+Serializing PageImpl instances as-is is not supported, meaning that there is no guarantee about the stability of the resulting JSON structure!
+```
+
+PageImpl 인스턴스를 있는 그대로 직렬화하는 것은 지원되지 않습니다. 즉, 결과 JSON 구조의 안정성이 보장되지 않습니다! 라는 경고 메세지.....ㅎㅎㅎㅎㅎㅎㅎ...................
+
+리팩토링했던 코드(service)
+
+```java
+@Transactional(readOnly = true)
+    public Page<ChallengeSummaryResponseDto> getAllChallenges(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Challenge> challengeList = challengeRepository.findAll(pageable);
+        if (challengeList.isEmpty()) {
+            throw new GlobalException(ErrorCode.NOT_FOUND_CHALLENGE);
+        }
+        List<ChallengeSummaryResponseDto> dtoList = new ArrayList<>();
+
+        for (Challenge challenge : challengeList) {
+            ChallengeSummaryResponseDto dto = new ChallengeSummaryResponseDto(challenge);
+            dtoList.add(dto);
+        }
+        return new PageImpl<>(dtoList, pageable, challengeList.getTotalElements());
+    }
+```
+
+다시 리팩토링한 코드...😂
+
+
+```java
+
+@Transactional(readOnly = true)
+    public PaginationResponse<ChallengeSummaryResponseDto> getAllChallenges(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Challenge> challenges = challengeRepository.findAll(pageable);
+        if (challenges.isEmpty()) {
+            throw new GlobalException(ErrorCode.NOT_FOUND_CHALLENGE);
+        }
+        List<ChallengeSummaryResponseDto> challengeList = challenges.getContent().stream()
+            .map(ChallengeSummaryResponseDto::new)
+            .toList();
+
+        return new PaginationResponse<>(
+            challengeList,
+            challenges.getTotalPages(),
+            challenges.getTotalPages(),
+            challenges.getNumber(),
+            challenges.getSize()
+        );
+    }
+
+```
+
+
+![image](https://github.com/user-attachments/assets/06daddde-046d-4193-b4ba-313e0bc5cd78)
+
+경고메세지 사라졌다...하하
+
+- challengePage.getTotalPages(): (총 페이지 수)
+- challengePage.getTotalElements(): (총 레코드 수)
+- challengePage.getNumber(): (현재 페이지 번호)
+- challengePage.getSize(): (페이지당 레코드 수)
