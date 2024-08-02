@@ -257,3 +257,10 @@ PageImpl 인스턴스를 있는 그대로 직렬화하는 것은 지원되지 �
 - challengePage.getTotalElements(): (총 레코드 수)
 - challengePage.getNumber(): (현재 페이지 번호)
 - challengePage.getSize(): (페이지당 레코드 수)
+
+
+Third-party cookie will be blocked in future Chrome versions as part of Privacy Sandbox.
+
+ chrome://settings/trackingProtection
+
+ ![image](https://github.com/user-attachments/assets/b9def08b-465a-4876-ae96-dfbecc2fe07d)
