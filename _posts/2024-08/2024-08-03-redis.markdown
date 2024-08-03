@@ -1,0 +1,145 @@
+---
+layout: post
+title:  "TIL(20240803) [redis?]"
+date:  2024-08-03
+categories: TIL redis
+---
+
+----------------------------------------------------------------------------
+
+프로젝트 중간발표를 앞두고 있다. 어느정도 뼈대를 만들고 중간중간에 프론트 렌더링을 하면서 기능 추가가 필요한 백엔드 부분도 동시에 진행하며 작업했다. 정말 이리갔다 저리갔다하면서 힘들었다... ㅎㅎ;
+
+기획설계때 조금 더 꼼꼼하게 햇더라면 좋았을텐데, 라는 생각도 있지만 상황에 맞춰서 진행하는 법도 필요하다고 생각했다. 
+
+어느정도 프론트 렌더링이 끝나서 테스트 하는 과정에서 챌린지 인증이 승인될 경우 500point씩 적립되니 포인트가 가장 많은 사용자 랭킹순위 조회? 기능을 구현한다면 사용자들의 참여도가 높아질 수 있지 않을까 라는 생각이 들었다. 사실 포인트를 받아 그 포인트로 뭔가를 보상할 수 있는 물질적인 요소나 그런부분이 필요하다고 생각했지만.. 그것까진 같이 얘기해보지 못했다. 
+
+어쨌든 챌린지 인증을 가장 많이해서 포인트를 많이 획득한 유저의 랭킹 조회  기능부분이 필요하다고 생각했는데,  N+1문제라던가 (나의 추측: 왠지 발생할 것 같다 userchallenge 테이블과 challenge테이블과 그리고 user의 테이블까지 join해야하는 상황이라 N+1문제가 발생할 것 이다. 연관관계를 가진 객체를 조회할 때  추가 쿼리.. 쿼리문으로 인한 데이터베이스 부하 및 서버부하 문제) 그리고 어제 챌린지 top10조회 데이터가 ui로 늦게 나타난다 라는 점이... 이상하다 생각했는데, 뭔가 성능적으로 문제가 있는건가.. 라는 생각이 들기도 했고 또 한편으로는 순위라던가 랭킹을 조회할 때 api를 요청할 때마다 데이터베이스가 매번 데이터를 정렬해서 가져오는게 아니라 그냥 정렬된 데이터를 가져오는 건 안되는가? 라는 생각이 들었고 찾아보니 **redis**를 활용하면 좋겠다라는 생각이 들었다. 
+
+그럼 redis가 무엇인지 알아보자
+
+Redis는 인메모리 데이터 저장소로 즉, 데이터를 RAM에 저장하는데, 이를 통해 디스크 기반인 데이터베이스에 비해 매우 빠른 읽기 및 쓰기 작업이 가능하다. 그래서 순위를 자주 확인하거나 실시간 애플리케이션의 경우 Redis는 거의 즉각적인 응답을 제공할 수 있기에 많이 사용된다. 
+
+그리고 Redis는 확장성이 뛰어나도록 설계되었다고 한다. 대규모 데이터 세트와 높은 처리량 시나리오를 처리할 수 있으므로 부하가 심한 경우에도 순위를 빠르게 계산하고 액세스해야 하는 애플리케이션에 적합하다는 것!
+
+<실제 활용 사례>
+- 캐싱(Cashing): 임시 비밀번호(One-Time Password), 로그인 세션(Session), JWT(JSON Web Token), 일정 주기로 갱신해도 괜찮은 데이터, 동일한 연산에 따른 결과
+- 실시간 분석: 순위(Rank), 실시간 이벤트 로그 처리, 방문자 수 계산
+- Pub/Sub 패턴: 실시간 채팅, 이벤트 메시징 처리
+- 큐(Queue): 우선 순위 큐, 이메일 전송
+
+[레디스(Redis)는 언제 어떻게 사용하는 게 좋을까](https://brunch.co.kr/@skykamja24/575)
+
+[[Redis] 레디스 소개와 특징 및 장점 그리고 실제 활용 사례](https://velog.io/@dev_lee/Redis-%EB%A0%88%EB%94%94%EC%8A%A4-%EC%86%8C%EA%B0%9C%EC%99%80-%ED%8A%B9%EC%A7%95-%EB%B0%8F-%EC%9E%A5%EC%A0%90-%EA%B7%B8%EB%A6%AC%EA%B3%A0-%EC%8B%A4%EC%A0%9C-%ED%99%9C%EC%9A%A9-%EC%82%AC%EB%A1%80)
+
+
+레디스를 알아둔다면 나중에 다양한 기능들을 상황에 따라 다르겠지만 여러가지 기능측면에서 필요시 성능최적화로 구현할 수 있다라는 느낌적 느낌...😁😅
+
+하지만 잘못 다루는 경우는 그에 따른 서버부하나 데이터가 사라지는 등.. 여러문제가 발생할 수 있다고 하니 잘 알고 사용하는 것이 좋을 것 같다... 
+
+나는 sorted set을 사용하여 랭킹 순위 조회를 해볼 생각이다.
+
+set의 자료구조는 중복이 허락되지 않고 무순서라는 특징이 있지만 
+redis에서는 Sorted Set은 중복되지는 않지만 Score를 가지고 있어서 이 가중치에 따라 정렬해서 저장할 수 있다고 한다. 
+
+```
+Redis Sorted Set를 사용하면 새 요소 추가, 점수 업데이트, 순위 검색과 같은 작업을 효율적으로 수행할 수 있어 상위 N개 항목을 검색하거나 특정 항목의 순위를 확인하는 등의 작업은 O(log N) 작업이므로 대규모 데이터 세트에서도 성능이 뛰어나다고 한다.
+```
+
+[(쿠키)Redis의 Sorted set을 사용하여 랭킹 기능 구현하기](https://medium.com/@yukeon97/spring-redis%EB%A1%9C-%EB%9E%AD%ED%82%B9-%EC%8B%9C%EC%8A%A4%ED%85%9C-%EA%B5%AC%ED%98%84%ED%95%98%EA%B8%B0-ea1ea9313e16)
+
+[Redis를 통한 랭킹보드 구현해보기 (SpringBoot+Redis)-포인트](https://cantcoding.tistory.com/82)
+
+[스프링부트 커뮤니티 API 서버 만들기 #18 Redis를 이용해서 포인트 랭킹 구현하기 (Sorted Set = ZSet)](https://m.blog.naver.com/sosow0212/222988094022)
+
+
+## 📌 Redis 사용하기 실습
+
+redis를 사용해본 적이 없는 나는 블로그를 따라하면서 익숙해지기 위해 노력하는 중...😁
+
+의존성 추가
+
+```java
+implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+```
+
+application.properties
+
+```java
+# Redis 
+Settingredis.host=localhost
+redis.port=6379
+spring.cache.type=redis
+```
+
+template을 만들어 bean 등록
+
+
+```java
+@Configuration
+@EnableRedisRepositories
+public class RedisConfig {
+
+    @Value("${spring.redis.port}")
+    private int port;
+
+    @Value("${spring.redis.host}")
+    private String host;
+
+    @Bean
+    public RedisConnectionFactory redisConnectionFactory() {
+        return new LettuceConnectionFactory(host, port);
+    }
+
+    @Bean
+    public RedisTemplate<String, String> redisTemplate() {
+        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setKeySerializer(new StringRedisSerializer());//key 깨짐 방지
+        redisTemplate.setValueSerializer(new StringRedisSerializer());//value 깨짐 방지
+        redisTemplate.setConnectionFactory(redisConnectionFactory());
+        return redisTemplate;
+    }
+
+    // @Bean
+    //public RedisTemplate<?, ?> redisTemplate() {
+    //    RedisTemplate<?, ?> redisTemplate = new RedisTemplate<>();
+    //    redisTemplate.setConnectionFactory(redisConnectionFactory());
+    //    redisTemplate.setDefaultSerializer(new StringRedisSerializer());
+    //    return redisTemplate;
+    //}
+}
+```
+
+(필요시)Redis 캐시 설정 클래스 생성
+
+```java
+// @Configuration
+// @EnableCaching
+// public class RedisCacheConfig {
+//     @Bean
+//     public CacheManager cacheManager(RedisConnectionFactory cf) {
+//         RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
+//                 .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
+//                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()))
+//                 .entryTtl(Duration.ofMinutes(3L)); // 캐쉬 저장 시간 3분 설정
+ 
+//         return RedisCacheManager
+//                 .RedisCacheManagerBuilder
+//                 .fromConnectionFactory(cf)
+//                 .cacheDefaults(redisCacheConfiguration)
+//                 .build();
+//     }
+// }
+```
+
+기억해두기
+
+-reverseRangeByScore메서드를 사용하면 원하는 score 범위의 value값을 원하는 갯수만큼 가져올 수 있는 기능을 한다. 
+
+[[Spring Boot] Redis로 랭킹 기능 구현하기](https://programmingiraffe.tistory.com/172)
+
+[jwt토큰 - redis활용](https://velog.io/@letelumiere/squadmania-dev-8)
+
+[[Spring + Redis] Redis cache를 적용해 조회 성능 개선 방법](https://hstory0208.tistory.com/entry/Spring-Redis-Redis-cache%EB%A5%BC-%EC%A0%81%EC%9A%A9%ED%95%B4-%EC%A1%B0%ED%9A%8C-%EC%84%B1%EB%8A%A5-%EA%B0%9C%EC%84%A0-%EB%B0%A9%EB%B2%95)
+
+
+도커에서 redis 추가하여 구현할 것!
