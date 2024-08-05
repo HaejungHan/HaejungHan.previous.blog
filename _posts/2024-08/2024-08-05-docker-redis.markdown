@@ -146,4 +146,40 @@ docker run -it --link myredis:redis --rm redis redis-cli -h redis -p 6379
 
 왜 typedTuples size =0 일까... 후..
 
-redis - 시간복잡도
+알고보니 dto에 값을 잘못 넣어주고 있었다.
+
+멍충..
+
+
+
+## ⭐redis - 시간복잡도 확인하기
+
+
+
+## 💡 Docker 컨테이너에서 Redis CLI 관련 명령어
+
+1) 순위 데이터 확인
+
+```
+ZRANGE ranking 0 -1 WITHSCORES
+```
+
+2) Redis 데이터베이스의 모든 키를 확인
+
+```
+KEYS *
+```
+
+3) 특정 유저의 ranking 확인
+
+```
+ZSCORE ranking user1(username)
+```
+
+종료는 exit 또는 ctrl+D
+
+
+
+
+
+
