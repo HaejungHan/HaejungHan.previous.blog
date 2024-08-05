@@ -152,8 +152,25 @@ docker run -it --link myredis:redis --rm redis redis-cli -h redis -p 6379
 
 postman 조회
 
-![image](https://github.com/user-attachments/assets/2d33d47e-0c6d-418f-a2dd-8c891a77e48a)
+![image](https://github.com/user-attachments/assets/127decc5-d0f9-4bd2-b3f0-c44672f0e074)
 
+Redis cli 에서 데이터 확인시
+```
+127.0.0.1:6379> ZRANGE ranking 0 -1 WITHSCORES
+1) "\xec\x88\x9c\xec\x9d\xb4\xec\x9e\x85\xeb\x8b\x88\xeb\x8b\xb9"
+2) "500"
+3) "\xec\xb2\xa0\xec\x88\x98\xec\x9d\xb4\xec\x97\x90\xec\x9a\xa9"
+4) "500"
+5) "\xec\x98\x81\xed\x9d\xac\xec\x9e\x85\xeb\x8b\x88\xeb\x8b\xa4"
+6) "3000"
+7) "adminNick"
+8) "10000"
+```
+\xec\x88\x9c\xec\x9d\xb4\xec\x9e\x85\xeb\x8b\x88\xeb\x8b\xb9 이게 뭐냐구우..........?
+
+- 유니코드 문자를 16진수로 표현한 것. Redis CLI는 일반적으로 인쇄할 수 없는 문자 또는 유니코드 문자를 이 인코딩된 형식으로 표시된다. CLI를 통해 볼 때 Redis가 인코딩된 형식으로 문자열 값을 저장하는 것은 일반적이며, 이는 주로 기본 ASCII 세트에 포함되지 않은 문자를 표시하기 위한 것이라고 한다. 
+
+😅 이거 반환값을 아이디(영어)로 바꾸자고 해야할지 고민된다..팀원들이랑 이 부분에 대해서 얘기를 해봐야겠다. 다른 방법이 있으려나..? 포스트맨 조회시에는 닉네임이 잘 받아져서 나오긴 한다만..
 
 ## ⭐redis - 시간복잡도 확인하기
 
@@ -188,6 +205,8 @@ ZSCORE ranking user1(username)
 ```
 Error processing condition on org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration.propertySourcesPlaceholderConfigurer
 ```
+
+인텔리제이 껏다가 키니까 된당.....😂
 
 
 
