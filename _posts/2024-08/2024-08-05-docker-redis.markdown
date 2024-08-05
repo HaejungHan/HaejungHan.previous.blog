@@ -150,6 +150,9 @@ docker run -it --link myredis:redis --rm redis redis-cli -h redis -p 6379
 
 멍충..
 
+postman 조회
+
+![image](https://github.com/user-attachments/assets/2d33d47e-0c6d-418f-a2dd-8c891a77e48a)
 
 
 ## ⭐redis - 시간복잡도 확인하기
@@ -179,6 +182,12 @@ ZSCORE ranking user1(username)
 종료는 exit 또는 ctrl+D
 
 
+
+커밋하고 푸시하는 과정에 갑자기.. 에러
+뭐지.. 의존성 추가도 해놓고 다했는데 왜왜왜.. push만 하면 되는데 왜왜왜... 잘되었는데 왜 갑자기..ㅠ_ㅠ
+```
+Error processing condition on org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration.propertySourcesPlaceholderConfigurer
+```
 
 
 
