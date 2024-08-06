@@ -1,0 +1,40 @@
+---
+layout: post
+title:  "TIL(20240806) [성능테스트를 위한 더미데이터]"
+date:  2024-08-06
+categories: TIL 성능테스트
+---
+
+----------------------------------------------------------------------------
+
+## 💡 Spring 데이터베이스에 더미데이터 추가하는 방법 4가지
+
+1. data.sql :스크립트 파일에 더미 데이터 추가하는 쿼리문 작성
+2. @PostConstruct : Spring의 @PostConstruct를 사용해 초기화
+3. @EventListener(ApplicationReadyEvent.class) 
+4. @ApplicationRunner : Spring의 @ApplicationRunner를 사용해 초기화
+
+[Spring 데이터베이스에 더미데이터 추가하는 방법 4가지](https://engineerinsight.tistory.com/71)
+
+4가지 다 비슷하지만 효율적으로 더미데이터를 추가할 수 있는 방법이 뭘까 생각했을 때 4번이 적합하다고 생각했다.
+2번은 트랜잭션을 사용할 수 없다는 것에서 탈락
+3번은 @PostConstruct라는 어노테이션을 달아줘야하고 뭔가 신경쓸 부분이 발생할 것 같았다. 최대한 독립적으로 더미데이터 생성이 이루어질 수 있는 환경이 필요했는데 4번이라 생각했다.
+
+그래서 4번을 어떤 패키지에 넣을것인가에 대한 고민을 했다.
+
+spring boot프로젝트는 패키지를 구조화하여 관리하기 때문에 일단 챌린지 생성을 하는 해당하는 레이어 repository쪽에 넣어야 겠다고 생각했다.
+
+[홈페이지 로딩 시간이 3초 이상일 때 발생하는 일들 | media trend - BLUEDOT Blog](https://www.blue-dot.io/ko/blog/post/666/)
+[긴 로딩으로 인한 사용자 이탈막기](https://brunch.co.kr/@rightbrain/61)
+
+-------------------------------------------------------------
+
+도메인주소 
+
+[freenom](https://www.freenom.com/en/index.html?lang=en)
+
+[가비아](https://www.gabia.com/?utm_source=google&utm_medium=cpc&utm_term=%EA%B0%80%EB%B9%84%EC%95%84&utm_campaign=%EA%B0%80%EB%B9%84%EC%95%84)
+
+
+## 
+https://junior-datalist.tistory.com/351
