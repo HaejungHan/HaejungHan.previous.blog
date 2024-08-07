@@ -135,3 +135,170 @@ jmeter로 하니까 또 저렇게 데이터가 나오니.. 음..
 어쨋든 500ms는 줄인거 같아서 좋은데.. 극명하게 저렇게 차이났던건 뭐지..ㅠ_ㅠ?.. 아직 부족한가부다.. 
 
 ** 높은 throughput은 시스템이 단위 시간당 많은 사용자 요청을 처리할 수 있음을 나타낸다. 따라서 일반적으로 throughput이 높을수록 시스템의 성능이 좋다고 할 수 있는데, throughput만으로 시스템의 전반적인 성능을 평가하는 것은 아니며 추가적으로 응답 시간, 에러율, 자원 사용률 등 다른 지표들도 고려해야 한다.
+
+## 💡 index, queryDSL, redis 포인트 랭킹 조회 구현
+
+1) index
+
+```java
+// user entity
+@Table(name = "db_users", indexes = {
+    @Index(name = "idx_point", columnList = "point")
+}) 
+```
+
+```java
+// repository
+  @Query("SELECT NEW com.bod.bod.user.dto.PointRankingResponseDto(u.nickname, u.point) FROM User u ORDER BY u.point DESC")
+  List<PointRankingResponseDto> findPointRanking();
+```
+
+동일한 point를 가진 사람은 예를 들어 공동2위로 구현하고 싶어서 5위까지 보일 수 있도록 구현해보았다. 
+
+```java
+// userServiceImpl
+@Override
+  public List<PointRankingResponseDto> getRankingList() {
+	List<PointRankingResponseDto> rankingList = userRepository.findPointRanking();
+  
+  // 순위 매기기 + 동점자 처리
+	int currentRank = 1;
+	for (int i = 0; i < rankingList.size(); i++) {
+	  PointRankingResponseDto currentDto = rankingList.get(i);
+
+	  if (i > 0) {
+		PointRankingResponseDto beforeDto = rankingList.get(i - 1);
+		if (currentDto.getPoint() == beforeDto.getPoint()) {
+		  currentDto.setRank(beforeDto.getRank());
+		} else {
+		  currentDto.setRank(currentRank);
+		}
+	  } else {
+		currentDto.setRank(currentRank);
+	  }
+	  currentRank++;
+	}
+
+	List<PointRankingResponseDto> top5RankingList = new ArrayList<>();
+	int count = 0;
+	for (PointRankingResponseDto dto : rankingList) {
+	  if (count >= 5) {
+		break;
+	  }
+	  top5RankingList.add(dto);
+	  count++;
+	}
+
+	return top5RankingList;
+  }
+```
+
+2. QueryDSL
+
+```java
+// UserCustomRepositoryImpl
+ public List<PointRankingResponseDto> getPointRankingTop5List() {
+	QUser user = QUser.user;
+
+	List<PointRankingResponseDto> rankingPointList = queryFactory
+		.select(Projections.constructor(PointRankingResponseDto.class,
+			user.nickname,
+			user.point))
+		.from(user)
+		.orderBy(user.point.desc())
+		.limit(10)
+		.fetch();
+
+	int rank = 1;
+	long beforePoint = 0;
+	int count = 0;
+
+	for (PointRankingResponseDto dto : rankingPointList) {
+	  if (dto.getPoint() != beforePoint) {
+		rank = count + 1;
+	  }
+	  dto.setRank(rank);
+	  beforePoint = dto.getPoint();
+
+	  count++;
+	  if (rank == 5 && count >= 5) {
+		break;
+	  }
+	}
+	return rankingPointList.stream().limit(5).toList();
+  }
+```
+
+```java
+// UserServiceImpl
+ @Override
+  public List<PointRankingResponseDto> getRankingList() {
+	List<PointRankingResponseDto> rankingList = userRepository.getPointRankingTop5List();
+	return rankingList;
+  }
+```
+
+```java
+// PointRankingResponseDto
+public class PointRankingResponseDto {
+
+  private int rank;
+  private String nickName;
+  private long point;
+
+  @QueryProjection
+  public PointRankingResponseDto(String nickName, long score) {
+    this.nickName = nickName;
+    this.point = score;
+  }
+}
+```
+
+3. redis
+
+```
+// UserServiceImpl
+@Override
+  public List<PointRankingResponseDto> getRankingList() {
+	String key = "ranking";
+	ZSetOperations<String, String> stringStringZSetOperations = redisTemplate.opsForZSet();
+	Set<ZSetOperations.TypedTuple<String>> typedTuples = stringStringZSetOperations.reverseRangeWithScores(key, 0, 10);
+	List<PointRankingResponseDto> rankingList = typedTuples.stream()
+		.map(tuple -> new PointRankingResponseDto(tuple.getValue(), tuple.getScore()))
+		.toList();
+	return sortRanks(rankingList);
+  }
+
+  private List<PointRankingResponseDto> sortRanks(List<PointRankingResponseDto> rankingList) {
+	List<PointRankingResponseDto> rankedList = new ArrayList<>();
+	int rank = 1;
+	int currentRank = 1;
+	long beforePoint = 0;
+
+	for (PointRankingResponseDto dto : rankingList) {
+	  if (dto.getPoint() != beforePoint) {
+		rank = currentRank;
+	  }
+	  dto.setRank(rank);
+	  beforePoint = dto.getPoint();
+	  currentRank++;
+	  rankedList.add(dto);
+	}
+	return rankedList.stream().limit(5).toList();
+  }
+```
+
+```
+// PointRankingResponseDto
+public class PointRankingResponseDto {
+
+  private int rank;
+  private String nickName;
+  private long point;
+
+  public PointRankingResponseDto(String nickName, double score) {
+    this.nickName = nickName;
+    this.point = (long) score;
+  }
+}
+```
