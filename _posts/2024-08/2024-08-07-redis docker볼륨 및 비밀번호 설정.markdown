@@ -104,3 +104,32 @@ redis-server
 넣었던 더미데이터 삭제하기
 
 ![image](https://github.com/user-attachments/assets/022490d4-4f54-44e8-a01e-a36a86105977)
+
+## 💡 apache jmeter 성능테스트
+
+[apache jmeter 성능테스트](https://blog.naver.com/wisestone2007/222160380337)
+
+포인트 랭킹조회를 QueryDSl과 redis로 구현해서 성능테스트 해보았다.
+
+
+더미데이터 유저 500명 넣음
+
+![image](https://github.com/user-attachments/assets/6620f9e9-1692-4217-9100-639ca8bb59e5)
+
+QueryDSL로 구현한 랭킹조회 api호출
+![image](https://github.com/user-attachments/assets/d1337713-1760-4914-bbeb-a524903208a1)
+
+redis로 구현한 랭킹조회 api호출
+![image](https://github.com/user-attachments/assets/59ac20a4-e73b-40fc-8418-6d8cedf42f16)
+
+포스트맨으로 1번 조회 요청을 했을때랑 2번 조회를 했을 때랑
+속도가 너무 달라서 테스트에 신뢰성이 떨어졌다..
+
+querydsl
+![image](https://github.com/user-attachments/assets/44fae4db-104d-441e-bafd-2c17b5b1d70b)
+redis
+![image](https://github.com/user-attachments/assets/0ba15074-5634-4441-b42c-d01df8f516f8)
+
+처음에 저것만 보고 와 완전 반 이상을 줄였다 했는데..
+jmeter로 하니까 또 저렇게 데이터가 나오니.. 음..
+어쨋든 500ms는 줄인거 같아서 좋은데.. 극명하게 저렇게 차이났던건 뭐지..ㅠ_ㅠ?.. 아직 부족한가부다.. 
