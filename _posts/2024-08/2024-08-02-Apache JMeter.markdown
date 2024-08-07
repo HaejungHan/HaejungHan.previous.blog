@@ -31,3 +31,5 @@ categories: TIL 성능부하테스트
 [window10 apache JMeter설치2](https://akku-dev.tistory.com/28)
 
 [JMeter 사용해보기](https://pepega.tistory.com/86)
+
+[JMeter restAPI부하주기](https://pepega.tistory.com/87)
