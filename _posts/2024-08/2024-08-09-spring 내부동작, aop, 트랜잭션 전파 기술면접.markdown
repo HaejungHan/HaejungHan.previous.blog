@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "TIL(20240809) []"
+title:  "TIL(20240809) [spring 내부동작? 그리고 AOP와 트랜잭션 전파]"
 date:  2024-08-09
 categories: TIL 기술면접
 ---

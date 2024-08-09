@@ -83,6 +83,6 @@ spring만 빼주니까.. 작동한다...
 ![image](https://github.com/user-attachments/assets/30c23c5b-f47f-47c8-9bdc-616c605a215f)
 
 
-
+[이메일 인증구현 영상](https://www.veed.io/view/435bbf4f-f323-4691-aaa3-68f31436144e?panel=share)
 
 [Gmail SMTP를 활용한 이메일 인증 기능 개발 with Redis](https://hareandrabbit.tistory.com/entry/Spring-Gmail-SMTP%EB%A5%BC-%ED%99%9C%EC%9A%A9%ED%95%9C-%EC%9D%B4%EB%A9%94%EC%9D%BC-%EC%9D%B8%EC%A6%9D-%EA%B8%B0%EB%8A%A5-%EA%B0%9C%EB%B0%9C-with-Redis)
