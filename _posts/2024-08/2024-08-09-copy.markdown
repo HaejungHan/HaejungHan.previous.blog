@@ -1,0 +1,17 @@
+---
+layout: post
+title:  "TIL(20240809) []"
+date:  2024-08-09
+categories: TIL 기술면접
+---
+
+----------------------------------------------------------------------------
+
+
+## 🔒 사용자가 API 요청에 대한 응답을 할 때 spring 내부 동작에 대해 설명해보자.
+
+- 클라이언트가 HTTP요청을 서버로 보내면 이 요청을 spring의 내장 웹서버인 (Tomcat-was 등)에 의해 받게 되고 디스패처 서블릿이 이 요청을 처리하게 되는데,(handlermapping을 통해 해당 요청에 맞는 컨트롤러 정보를 받아온 후 handlerAdapter에게 전달하여) 해당 요청에 맞는 컨트롤러로 라우팅을 하게됩니다. 그리고 해당 요청이 매핑된 컨트롤러 메서드가 호출이 되고 이 메서드는 해당 비지니스 로직을 수행하는데, 필요한 경우에는 서비스 계층을 호출하여 데이터를 처리하게 됩니다. 여기서 데이터를 처리한다라고 하면은 데이터 조회나 외부 API호출 등을 의미하여 해당 작업을 수행함을 의미합니다. 그리고 컨트롤러는 처리결과를 기반으로 응답객체를 생성하는데,(handleradapter에게 전달하고 이를 받은 handleradapter는 model데이터와 view 이름을 반환) 이를 받은 디스패처 서블릿(viewresolver에게 view검색 요청하고 resolver는 view정보 반환, 다시 디스패처서블릿이 view에게 응답생성 요청하면 view는 응답생성 후 반환, thread에 응답을 담아서 반환)는 클라이언트에게 반환하게 됩니다.
+
+![image](https://github.com/user-attachments/assets/a9427a09-51e3-4680-a848-5865966c7549)
+
+![image](https://github.com/user-attachments/assets/83db72f6-baae-4c97-b5da-f0a7a915a2b3)
