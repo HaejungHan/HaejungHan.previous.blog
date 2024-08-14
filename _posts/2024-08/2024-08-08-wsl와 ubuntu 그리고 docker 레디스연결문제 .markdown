@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "TIL(20240808) []"
+title:  "TIL(20240808) [최종프로젝트 - 트러블슈팅1]"
 date:  2024-08-08
 categories: TIL redis
 ---
