@@ -256,7 +256,7 @@ public class PointRankingResponseDto {
 
 3. redis
 
-```
+```java
 // UserServiceImpl
 @Override
   public List<PointRankingResponseDto> getRankingList() {
@@ -288,7 +288,7 @@ public class PointRankingResponseDto {
   }
 ```
 
-```
+```java
 // PointRankingResponseDto
 public class PointRankingResponseDto {
 
