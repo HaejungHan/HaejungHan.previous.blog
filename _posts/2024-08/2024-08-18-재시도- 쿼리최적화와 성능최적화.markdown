@@ -87,6 +87,31 @@ DROP INDEX idx_point_desc ON db_users; // 삭제
 SHOW INDEX FROM db_users; // 삭제 되었는지 확인
 ```
 
-## 💡 QA 환경에서 포인트 랭킹조회 QueryDSL 구현기능 테스트
+## 💡 QA 환경에서 포인트 랭킹조회 테스트 결과
 
-일단 로컬에서 한번 
+쿼리문 확인
+
+spring data jpa
+![image](https://github.com/user-attachments/assets/ccb1fe30-a66b-4261-9852-661a6af77795)
+
+Querydsl
+![image](https://github.com/user-attachments/assets/607929cc-5c8f-4eeb-b1c0-0820c54bd774)
+
+
+--------QA환경-------------------------
+공통기준 : 유저 1000명 더미데이터 생성
+
+spring data jpa
+![image](https://github.com/user-attachments/assets/aacd7f59-6ad2-4f68-b10c-93a578688ad7)
+
+QueryDSL
+![image](https://github.com/user-attachments/assets/53712429-809b-43ef-9a9d-e53ec096aa89)
+
+redis
+![image](https://github.com/user-attachments/assets/84776ed0-ea35-41a2-8646-123a0e2aab05)
+
+
+처음 로컬에서 성능테스트를 했을 때 1600ms 때문에 충격받아서 시작했던 성능테스트가 실제 QA환경이 t2.small 인데
+저렇게 미묘하게 차이가 나다니.. 하하하하...
+로컬에서 테스트를 해도 확실치 않다는 걸 깨달았다.😂
+
