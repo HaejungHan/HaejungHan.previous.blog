@@ -44,7 +44,7 @@ SQL 콘솔에서 user 테이블의 point 필드에 내림차순 인덱스를 생
 
 - EXPLAIN 결과에서 ALL과 Using filesort가 나타난다면 인덱스가 최적화에 적합하지 않다는 의미
 - type에 ALL을 나타내는 것은 인덱스를 사용하지 않고 전체 테이블 스캔을 선택했다는 것을 의미
-- extra 칼럼의 Using filesort는 MySQL이 결과를 정렬하기 위해 추가적인 파일 정렬 작업을 수행하고 있다는 것을 의미합니다. 즉, MySQL이 임시 파일을 사용하여 결과를 정렬하고 있다는 것입니다. 이는 인덱스만으로는 정렬 작업을 수행할 수 없다는 것을 나타냅니다.
+
 
 5. 혹시나 데이터베이스의 통계가 오래되어서? 그런가.. 업데이트를 했으나
 ![image](https://github.com/user-attachments/assets/06c726c7-d14d-4516-bca6-a0a2b7c87db9)
