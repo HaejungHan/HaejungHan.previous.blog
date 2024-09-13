@@ -1,0 +1,50 @@
+---
+layout: post
+title:  "TIL(20240816) [UT : 사용성 테스트 피드백 개선 - 검색기능 추가구현]"
+date:  2024-08-16
+categories: TIL 
+---
+
+----------------------------------------------------------------------------
+
+![image](https://github.com/user-attachments/assets/6c1313cf-8b84-43be-a4a1-2161194b8f48)
+
+```java
+@GetMapping("/search")
+  public ResponseEntity<CommonResponseDto<PaginationResponse<ChallengeSummaryResponseDto>>> getChallengesBySearch(
+	  @RequestParam(value = "title", required = false) String title,
+	  @RequestParam(value = "page", defaultValue = "0") int page,
+	  @RequestParam(value = "size", defaultValue = "9") int size
+  ) {
+	PaginationResponse<ChallengeSummaryResponseDto> challengeListBySearch = challengeService.getChallengesBySearch(title, page, size);
+	return ResponseEntity.ok().body(new CommonResponseDto<>(
+		HttpStatus.OK.value(), "챌린지 제목 검색결과 조회 성공", challengeListBySearch));
+  }
+```
+
+```java
+@Transactional(readOnly = true)
+  public PaginationResponse<ChallengeSummaryResponseDto> getChallengesBySearch(String title, int page, int size) {
+	Pageable pageable = PageRequest.of(page, size);
+
+	if(title == null) {
+	  title = "";
+	}
+
+	Page<Challenge> challengeListBySearch = challengeRepository.findByTitleContaining(title, pageable);
+	if (challengeListBySearch.isEmpty()) {
+	  throw new GlobalException(ErrorCode.NOT_FOUND_CHALLENGE);
+	}
+
+	List<ChallengeSummaryResponseDto> challengeList = challengeListBySearch.getContent().stream()
+		.map(challenge -> new ChallengeSummaryResponseDto(challenge)).toList();
+
+	return new PaginationResponse<>(
+		challengeList,
+		challengeListBySearch.getTotalPages(),
+		challengeListBySearch.getTotalPages(),
+		challengeListBySearch.getNumber(),
+		challengeListBySearch.getSize()
+	);
+  }
+```

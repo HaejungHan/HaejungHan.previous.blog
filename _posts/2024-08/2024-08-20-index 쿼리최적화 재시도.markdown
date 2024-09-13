@@ -1,0 +1,68 @@
+---
+layout: post
+title:  "TIL(20240820) [index 쿼리최적화 재시도]"
+date:  2024-08-20
+categories: TIL 
+---
+
+----------------------------------------------------------------------------
+
+index 쿼리최적화를 하기 전 알아야 할 사항은 정렬할 레코드가 적을 경우에는 옵티마이저가 filesort로 선택하여 실행하는것이 더 빠르고 효율적일 수 있으나 레코드 수가 많아지면 정렬작업이 쿼리 실행 시 처리되기 때문에 쿼리 응답 속도가 느려지는 단점이 있다. 
+
+그런데 여기서 소트 버퍼(Sort buffer)라는 것을 알게되었는데,
+
+소트 버퍼(Sort buffer)는 메모리 내에서 데이터를 정렬하기 때문에(소량의 데이터의 경우에 메모리에 적재가능하기에) 디스크 접근이 필요 없어서 속도가 빠르며 filesort보다 효율적이다. 
+
+그렇다면 어떤 경우에 사용되는가? 
+
+- Filesort는 데이터가 메모리에 들어가기엔 너무 데이터 양이 많을 경우에 사용되며 디스크를 사용해 정렬처리를 한다. 
+- Sortbuffer는 메모리 내에서 데이터를 정렬하기 때문에 디스크 접근이 필요없어서 속도가 빠르다. 그 대신 소량의 데이터만 메모리에 적재 가능하다.
+
+그래서, 만약 filesort말고 레코드 양이 소량인 경우에 filesort를 사용하지 않고 소트버퍼를 사용하게 되면 정렬이 빠르게 처리된다. 
+
+[Real MySQL실행계획 - 풀 테이블 스캔, ORDER BY (Filesort)](https://weicomes.tistory.com/155)
+
+
+
+더미데이터 1000명 넣고 난 후 explain 
+![image](https://github.com/user-attachments/assets/2fae9720-ac6c-4073-b276-96b35a5144cd)
+
+다시 스테이징 환경의 인스턴스를 시작하러 AWS
+dev로 올린 이미지로 변경하기
+
+```
+docker-compose down // 실행중인 컨테이너 중지
+docker pull (hubname)/backend:latest 
+
+```
+
+docker pull (hubname)/backend:latest 했으나 
+```
+Error response from daemon: manifest for hhani/backend:lastest not found: manifest unknown: manifest unknown
+```
+그래서 docker desktop에서 hub - 해당 tag pull 버튼
+
+```
+docker pull (hubname)/backend:latest
+```
+
+다시 땡겨준 다음 imageId 확인 해줄 것 
+내가 desktop에서 땡긴 id와 일치한지
+
+```
+docker-compose up -d
+```
+
+결과적으로 스테이징 환경에서 확인해보니 인덱스로 정렬작업을 하니 확실히 속도가 **10%** 향상되긴 했다. 데이터가 적을 경우에는 옵티마이저가 filesort를 선택하여 정렬작업을 처리한다는 것과 데이터가 많을 경우에는 인덱스를 선택하여 작업을 효율적으로 처리한다는 것
+
+그리고 데이터가 적을 경우 효율성을 더 높이기 위해서 소트퍼버를 사용할 수 있다는 점도 알게되었다.
+
+```
+소트퍼버는 mysql 서버의 cnf 파일에서 설정할 수 있다.
+```
+
+spring data jpa
+![image](https://github.com/user-attachments/assets/aacd7f59-6ad2-4f68-b10c-93a578688ad7)
+
+spring data jpa (인덱스)
+![image](https://github.com/user-attachments/assets/ed1234bd-dbc8-4a1b-be0d-5e1fbb8bee46)

@@ -1,0 +1,92 @@
+---
+layout: post
+title:  "TIL(20240818) [재시도- 쿼리최적화와 성능최적화 QA환경에서 테스트]"
+date:  2024-08-18
+categories: TIL 
+---
+
+----------------------------------------------------------------------------
+
+프로젝트를 빨리 만들어서 제출해야한다는 생각에 허겁지겁했던 테스트를 한번 더 해보려고 한다. 
+그리고 로컬에서만 성능테스트를 해보았기 때문에 확실치 않다는 생각이 들어서 QA 인스턴스 환경에서 테스트를 해보려고 한다.
+
+```
+**EXPLAIN 명령어 사용: EXPLAIN 명령어를 사용하여 쿼리가 인덱스를 사용하는지 확인
+ex) EXPLAIN SELECT * FROM user ORDER BY point DESC LIMIT 10;
+```
+
+
+## 💡 포인트 랭킹조회 기능에 인덱스 쿼리최적화가 적합한가? (결과:NO)
+
+1. 인덱스 추가
+
+```
+CREATE INDEX idx_point_desc ON db_users(point DESC);
+```
+
+SQL 콘솔에서 user 테이블의 point 필드에 내림차순 인덱스를 생성한다. 이렇게 설정을 해두면 ORDER BY point DESC 쿼리 성능이 크게 향상된다.
+
+그 다음 
+
+2. SHOW INDEX FROM db_users; 명령어를 사용하여 point 필드에 대한 인덱스가 실제로 존재하는지 확인
+
+- SHOW INDEX 결과를 보면 idx_point_desc 인덱스가 제대로 생성된 것을 확인
+
+3. SELECT * FROM db_users ORDER BY point DESC LIMIT 10; 쿼리 실행해보기 (해당 쿼리가 잘 실행되는지 확인)
+
+
+4. EXPLAIN SELECT * FROM db_users ORDER BY point DESC LIMIT 10; 쿼리가 인덱스를 잘 사용해서 데이터를 불러오고 있는지 확인
+
+
+- 만약 EXPLAIN 결과에서 ALL과 Using filesort가 나타난다면 인덱스가 최적화에 적합하지 않다는 의미
+- type에 ALL을 나타내는 것은 인덱스를 사용하지 않고 전체 테이블 스캔을 선택했다는 것을 의미
+
+
+5. 분석
+![image](https://github.com/user-attachments/assets/06c726c7-d14d-4516-bca6-a0a2b7c87db9)
+
+
+```
+** 쿼리 옵티마이저는 쿼리 성능을 최적화하기 위해 다양한 실행 계획을 분석하고 선택하는 중요한 역할을 한다. 
+
+예를 들어 
+
+SELECT * FROM users WHERE age > 30 ORDER BY name;
+
+했을때 쿼리 옵티마이저는 
+
+- 인덱스 사용: age 컬럼에 인덱스가 있다면 이를 사용할지 여부를 결정
+- 정렬 방법: name 컬럼으로 정렬할 때 사용할 정렬 방법을 결정
+- 테이블 조인: 여러 테이블을 조인하는 경우, 조인의 순서와 방법을 결정
+```
+
+그래서 인덱스로 쿼리최적화 방법은 여기까지 진행하기로 했다.
+
+```
+// behind
+인덱스 추가했던 것 삭제해주기 
+
+DROP INDEX idx_point_desc ON db_users; // 삭제
+SHOW INDEX FROM db_users; // 삭제 되었는지 확인
+```
+
+## 💡 QA 환경에서 포인트 랭킹조회 테스트 결과
+
+
+--------QA환경-------------------------
+공통기준 : 유저 1000명 더미데이터 생성
+
+spring data jpa
+![image](https://github.com/user-attachments/assets/aacd7f59-6ad2-4f68-b10c-93a578688ad7)
+
+QueryDSL
+![image](https://github.com/user-attachments/assets/53712429-809b-43ef-9a9d-e53ec096aa89)
+
+redis
+![image](https://github.com/user-attachments/assets/84776ed0-ea35-41a2-8646-123a0e2aab05)
+
+
+처음 로컬에서 성능테스트를 했을 때 1600ms 때문에 충격받아서 시작했던 성능테스트가 실제 QA환경이 t2.small 인데
+저렇게 미묘하게 차이가 나다니.. 하하하하...
+로컬에서 테스트를 해도 확실치 않다는 걸 깨달았다.😂
+

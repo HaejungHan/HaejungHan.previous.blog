@@ -1,248 +1,56 @@
 ---
 layout: post
-title:  "TIL(20240810) [이미지업로드 관련 코드 리팩토링]"
-date:  2024-08-10
-categories: TIL refactor
+title:  "TIL(20240811) [이미지업로드 관련 코드 리팩토링]"
+date:  2024-08-11
+categories: TIL redis
 ---
 
 ----------------------------------------------------------------------------
 
 
-챌린지 등록시 그리고 인증요청시 이미지 업로드 기능이 있는데 각각 하나의 함수 안에 모든 로직이 처리되어있어서
-코드의 반복과 가독성이 떨어진다는 느낌을 받았다.
 
-그래서 주말동안 다른부분도 마찬가지겠지만 코드 리팩토링을 하기로 계획했다.
+## 💡 개발자는 레디스를 어떻게 사용하는가? 
+- 크게 2가지 방법을 사용한다.
+- 1) 로컬환경에서 레디스를 호출한다. AWS EC2를 예로 들면 인스턴스에 레디스를 설치해 인스턴스 메모리를 사용해 레디스를 사용하는 방법이다. 인스턴스의 메모리 여유가 있다면 비용적인 측면으로나 사용성 측면으로나 뛰어나다. (내가 최종프로젝트때 사용한 방식)
+- 2) 클라우드 서비스를 사용해 외부 자원을 사용한다. 레디스 랩등의 서드파티 서비스를 사용해 레디스를 사용하게 되면 통신하는 웹서버가 아무리 많아도 하나의 프레임워크 바인딩을 사용할 수 있다고 한다. 이 경우에는 레디스는 여러 웹 서버들의 공유 메모리 역할을 감당할 수 있게 된다.(아직 이 방법은 사용해보지 않아서 잘 모르겠다.)
 
-```java
-// AdminService
-public AdminChallengeCreateResponseDto createChallenge(MultipartFile image, AdminChallengeCreateRequestDto reqDto, User loginUser) {
-        if (!loginUser.getUserRole().equals(UserRole.ADMIN)) {
-            throw new GlobalException(ErrorCode.USER_ACCESS_DENIED);
-        }
-        try {
-            ObjectMetadata metadata = new ObjectMetadata();
-            metadata.setContentType(image.getContentType());
-            metadata.setContentLength(image.getSize());
-            amazonS3Client.putObject(BUCKET, "challenge/" + image.getOriginalFilename(), image.getInputStream(), metadata);
+그래서 ... ! 
+레디스와 백엔드 프레임 워크와의 궁합은 전반적으로 괜찮은데, 대부분의 백엔드 프레임 워크를 지원하고, 모듈을 사용해 적절한 형태로 구현할 수 있어 개발 난이도는 비교적 낮다고 한다.
+(나는 난이도가 낮은지 잘 모르겠다..)
 
-            String imageUrl = amazonS3Client.getResourceUrl(BUCKET, "challenge/" + image.getOriginalFilename());
-            Challenge challenge = Challenge.builder()
-                .title(reqDto.getTitle())
-                .content(reqDto.getContent())
-                .image(image.getOriginalFilename())
-                .imageUrl(imageUrl)
-                .category(Category.valueOf(reqDto.getCategory()))
-                .conditionStatus(ConditionStatus.valueOf(reqDto.getConditionStatus()))
-                .startTime(reqDto.getStartTime())
-                .endTime(reqDto.getEndTime())
-                .limitedUsers(reqDto.getLimitedUsers())
-                .build();
-            Challenge savedChallenge = challengeRepository.save(challenge);
-            return new AdminChallengeCreateResponseDto(savedChallenge);
-        } catch (IOException e) {
-            throw new FileUploadFailureException("파일 업로드 실패");
-        }
-    }
-```
-```java
-// VerificationService
-@Transactional
-  public VerificationResponseDto requestVerification(Long challengeId, MultipartFile image, VerificationRequestDto requestDto, User user) {
-    try {
-      if(image.isEmpty()) {
-        throw new GlobalException(ErrorCode.EMPTY_FILE);
-      }
-      ObjectMetadata metadata= new ObjectMetadata();
-      metadata.setContentType(image.getContentType());
-      metadata.setContentLength(image.getSize());
-      amazonS3Client.putObject(BUCKET, "verification/" + image.getOriginalFilename(), image.getInputStream(), metadata);
+## 💡 레디스를 어디에 사용하면 좋은가?
+- 레디스를 사용하기 위해 억지로 넣는 건 좋지 않은 방법
+: 나의 경우에도 포인트 랭킹 조회시 queryDSL로 구현하였으나 더미데이터를 500개 정도 넣었을 때 평균 API호출시 응답속도가 1700ms에 가까웠다 2초에 가까운 속도. 그래서 쿼리 최적화가 필요할까 해서 터미널의 쿼리를 봤지만 N+1문제나 불필요한 쿼리문(당연하게 복잡한 연관관계가 없다.)이 나가지 않는 것을 확인했다. (유저의 포인트와 닉네임만 조회하는 쿼리문 queryInjection 활용) 레디스에서 sorted Set구조를 사용하면 순위 랭킹조회(특정 기준 값에 들어온 데이터만 필터링)에 효율적으로 데이터 조회가 가능하기에 레디스를 사용했다고 말할 수 있다.
 
-      Challenge challenge = challengeService.findById(challengeId);
+- 웹 서버에서 키-값 형태의 데이터 타입을 처리해야 하고, I/O가 빈번히 발생해 다른 저장방식을 사용하면 효율이 떨어지는 경우에 사용한다. 
+- I/O가 가장 빈번한 데이터는 어떤 상황? 조회수와 같은 카운트 형태의 데이터.. 
+(유투브나 블로그 같은 경우 엄청난 팔로우를 보유하고 있는 사람들은 1시간도 안돼서 100만 조회수를 넘기는 경우가 허다하다.) 이럴 경우 RDS 형태로 데이터를 저장한다면 I/O가 수백만 수천만번을 반복할 것이다. 
+- 이런 경우에 어마어마한 I/O를 발생시키는 데이터를 처리할 때 레디스를 사용해 데이터를 캐싱처리하고 일정한 주기에 따라 RDS에 업데이트를 한다면 성능은 크게 향상 될 수 있다. 
 
-      LocalDateTime currentDateTime = LocalDateTime.now();
-      LocalDate currentDate = currentDateTime.toLocalDate();
-      LocalDateTime startOfDay = currentDate.atStartOfDay();
-      LocalDateTime endOfDay = currentDate.atTime(LocalTime.MAX);
+- 또, 주로 많이 사용되는 건 사용자의 세션관리.. 사용자의 세션을 유지하고 불러오고, 여러 활동을 추적하는 게 매우 효과적이라고 한다. 그리고 API 캐싱, 아래 블로그를 통해 확인했다.
 
-      boolean checkVerification = verificationRepository.existsByChallengeIdAndUserAndCreatedAtBetween(
-          challengeId, user, startOfDay, endOfDay
-      );
+[redis캐시 활용해서  expressAPI속도 높이기](https://fors.tistory.com/582)
 
-      if(checkVerification) {
-       throw new GlobalException(ErrorCode.ALREADY_EXISTS_VERIFICATION);
-      }
+## 💡레디스의 데이터 구조 
+- 레디스는 관계형 데이터베이스가 아니다. 그렇기 때문에 데이터타입 VARCHAR,INT,DATETIME을 지원하지 않는다. 
+- 1) 문자열(STRING) : 거의 대부분 데이터를 문자열로 표현한다. 숫자나 날짜 및 시간 등을 문자열로 저장한다고 생각하면 쉽다.
+- 2) 해시(HASH) : 해시는 필드를 가질 수 있다. 예를 들어 사용자 정보라는 해시가 있다면 이메일과 닉네임을 가질 수 있다. 해시는 전체를 가져오거나 개별 필드를 가져올 수 있다. (이메일인증 구현시 해시를 사용했다.)
+- 3) 리스트(LIST) : 연결리스트이다. 배열의 왼쪽과 오른쪽에 요소를 추가할 수 있다. 단 리스트 안의 데이터는 문자열만 가능하다.
+- 4) 셋(SET) : 셋은 리스트와 유사한 특징을 보이지만 고유 값을 저장한다는 점에서 차이가 있다. (즉, 중복된 값을 저장하지 않는다라는 것) 고유 값이 정해진 셋에는 고유 값에 해당하는 멤버를 생성할 수 없고 셋은 정렬을 할 수 있는데 Sorted Set정렬을 통해서 특정 기준 값에 들어온 데이터만 필터링하는 게 가능하다. (포인트 랭킹조회시 SortedSet을 사용했다.)
 
-      String imageUrl= amazonS3Client.getResourceUrl(BUCKET, "verification/" + image.getOriginalFilename());
-      Verification verification = new Verification(requestDto.getTitle(), requestDto.getContent(), image.getOriginalFilename(), imageUrl, challenge, user);
-      verificationRepository.save(verification);
-      return new VerificationResponseDto(verification.getId(), verification.getTitle(), verification.getContent(), imageUrl, verification.getStatus());
+sorted set에 대해서 조금 더 구체적으로 설명해보자면 각 값에 점수를 부여하면 자동으로 정렬되게 되는데, 여기서 점수를 나는 포인트로 대체하였고 점수 범위로 값을 필터링하여 정렬하도록 했다. (하지만 여기서 점수가 같은 데이터는 정렬순서가 보장되지 않는 점에 주의해야한다.) 
 
-    } catch(IOException e) {
-      throw new FileUploadFailureException("파일 업로드 실패");
-    }
-  }
-```
+만약에 값(user)에 200point가 추가로 적립된다면 레디스의 구조는 다음과 같다.
+1. 해당 유저의 기존 점수(포인트)를 조회한다.
+2. 200point를 추가로 적립한다.
+3. 새로운 점수를 기준으로 랭킹을 재정렬한다. 
 
-이전에 작성했던 코드다. 챌린지를 생성하는 builder 부분은 내가 작성하진 않았고 이미지 업로드 기능만 내가 작성했다. 일단 봐도 무지 길다.. 가독성도 떨어지고 심지어 인증요청 부분에도 이미지 업로드 관련 코드가 중복됨을 확인할 수 있다.
+이러한 형태로 데이터가 업데이트 되면 그 순간 재정렬하기에 포인트랭킹조회시 RDS를 활용해서 조회하는 것보다 빠르다라고 생각했다. 그러니까 RDS를 활용하면 그때마다 데이터를 재정렬해서 해당 조건에 맞는 데이터를 가져오지만 redis의 sorted set을 활용하면 그때마다 정렬된 데이터를 가져오기에 성능적으로 효율적으로 작동하는것이 아닌가 라고 생각한다. 
 
-그리고 예외처리가 잘 되어있지 않는 것을 확인할 수 있는데,
-1) image 파일이 비어있는 경우
-2) s3 버킷 정책에 jpg,png,jpeg,gif 설정해놓았는데, 다른 파일 형식이 들어올 경우
-3) 파일크기에 대한 예외처리
 
-그래서 이부분에 대한 추가 예외처리와 공통기능에 대한 분리로 코드 중복을 제거하고 코드 재사용성을 높이고 싶었다.
-
-```java
-// S3ServiceImpl
-public class S3ServiceImpl implements S3Service {
-
-  private final AmazonS3Client amazonS3Client;
-
-  @Value("${cloud.aws.s3.bucket}")
-  private String BUCKET;
-
-  @Value("${spring.servlet.multipart.max-file-size}")
-  private String maxFileSize;
-
-@Override
-  public String imageUpload(MultipartFile image, String key) {
-	if (image.isEmpty()) {
-	  throw new GlobalException(ErrorCode.EMPTY_FILE);
-	}
-	fileSizeExceed(image);
-	allowedImageTypes(image);
-	try {
-	  ObjectMetadata metadata = new ObjectMetadata();
-	  metadata.setContentType(image.getContentType());
-	  metadata.setContentLength(image.getSize());
-	  amazonS3Client.putObject(BUCKET, key + image.getOriginalFilename(), image.getInputStream(), metadata);
-	  String imageUrl = amazonS3Client.getResourceUrl(BUCKET, key + image.getOriginalFilename());
-	  return imageUrl;
-	} catch (IOException e) {
-	  throw new FileUploadFailureException("파일 업로드 실패");
-	}
-  }
-
-@Override
-  public void deleteChallengeImage(Challenge challenge, String key) {
-	DeleteObjectRequest request = new DeleteObjectRequest(BUCKET, key + challenge.getImage());
-	amazonS3Client.deleteObject(request);
-  }
-
-  @Override
-  public void deleteVerificationImage(Verification verification, String key) {
-	DeleteObjectRequest request = new DeleteObjectRequest(BUCKET, key + verification.getImageName());
-	amazonS3Client.deleteObject(request);
-  }
-
-private long parseSize(String size) {
-	if (size.endsWith("MB")) {
-	  return Long.parseLong(size.replace("MB", "")) * 1024 * 1024;
-	} else if (size.endsWith("KB")) {
-	  return Long.parseLong(size.replace("KB", "")) * 1024;
-	} else if (size.endsWith("GB")) {
-	  return Long.parseLong(size.replace("GB", "")) * 1024 * 1024 * 1024;
-	} else {
-	  return Long.parseLong(size);
-	}
-  }
-
-  private void fileSizeExceed(MultipartFile image) {
-	if (image.getSize() > parseSize(maxFileSize)) {
-	  throw new GlobalException(ErrorCode.FILE_UPLOAD_ERROR);
-	}
-  }
-
-  private void allowedImageTypes(MultipartFile image) {
-	String fileName = image.getOriginalFilename();
-	if (fileName == null || !fileName.matches(".*\\.(jpg|jpeg|png|gif)$")) {
-	  throw new InvalidFileTypeException("지원되지 않는 파일 형식입니다: " + fileName);
-	}
-  }
-```
-
-일단 delete 같은경우는 해당 객체의 이미지를 불러와야 하기 때문에 매개변수에 대한 고민을 했다.
-너무 피곤한 탓일까.. 왜 도저히 어떻게 해야할지 떠오르지 않았다. 일단은 나중에 또 수정해보기로 하고 
-delete challenge/verification 함수를 각각 만들어줬다. (일단 무지 찝찝하다. 이 부분은 방법을 찾아서 추후에 수정할 것이다.)
-
-파일 크기와 파일형식은 내부메서드로 정의해주었다.
-
-```java
-// 리팩토링 후 adminSevice
-
-@Transactional
-    public AdminChallengeCreateResponseDto createChallenge(MultipartFile image, AdminChallengeCreateRequestDto reqDto, User loginUser) {
-        if (!loginUser.getUserRole().equals(UserRole.ADMIN)) {
-            throw new GlobalException(ErrorCode.USER_ACCESS_DENIED);
-        }
-            String key = "challenge/";
-            String imageUrl = s3Service.imageUpload(image, key);
-            Challenge challenge = Challenge.builder()
-                .title(reqDto.getTitle())
-                .content(reqDto.getContent())
-                .image(image.getOriginalFilename())
-                .imageUrl(imageUrl)
-                .category(Category.valueOf(reqDto.getCategory()))
-                .conditionStatus(ConditionStatus.valueOf(reqDto.getConditionStatus()))
-                .startTime(reqDto.getStartTime())
-                .endTime(reqDto.getEndTime())
-                .limitedUsers(reqDto.getLimitedUsers())
-                .build();
-            Challenge savedChallenge = challengeRepository.save(challenge);
-            return new AdminChallengeCreateResponseDto(savedChallenge);
-
-    }
-```
-
-```java
-// 리팩토링 후 VerificationService
-@Transactional
-  public VerificationResponseDto requestVerification(Long challengeId, MultipartFile image, VerificationRequestDto requestDto, User user) {
-      Challenge challenge = challengeService.findById(challengeId);
-
-      duplicateVerification(challengeId, user);
-
-      String key = "verification/";
-      String imageUrl = s3Service.imageUpload(image, key);
-      Verification verification = new Verification(requestDto.getTitle(), requestDto.getContent(), image.getOriginalFilename(), imageUrl, challenge, user);
-      verificationRepository.save(verification);
-      return new VerificationResponseDto(verification.getId(), verification.getTitle(), verification.getContent(), imageUrl, verification.getStatus());
-  }
-
-  @Transactional
-  public void cancelVerification(Long verificationId, User user) {
-    Verification verification = findVerificationById(verificationId);
-    if(verification.getStatus().equals(Status.APPROVE)) {
-      throw new GlobalException(ErrorCode.DO_NOT_CANCEL_VERIFICATION);
-    }
-    verification.checkUser(user);
-    String key = "verification/";
-    s3Service.deleteVerificationImage(verification, key);
-    verificationRepository.delete(verification);
-  }
-
-  private void duplicateVerification(Long challengeId, User user) {
-    LocalDateTime currentDateTime = LocalDateTime.now();
-    LocalDate currentDate = currentDateTime.toLocalDate();
-    LocalDateTime startOfDay = currentDate.atStartOfDay();
-    LocalDateTime endOfDay = currentDate.atTime(LocalTime.MAX);
-
-    boolean checkVerification = verificationRepository.existsByChallengeIdAndUserAndCreatedAtBetween(
-        challengeId, user, startOfDay, endOfDay
-    );
-
-    if(checkVerification) {
-      throw new GlobalException(ErrorCode.ALREADY_EXISTS_VERIFICATION);
-    }
-  }
-```
-
-이 부분 말고도 리팩토링해야 할 다른 코드들이 많다..하하하..! 
-처음 코드를 작성할 때 조금 더 신중해야지 하면서도 마감기한 때문에 신경을 많이 못썼던 것 같다.
-이번기회로 리팩토링 하면서 나의 코드가 참 가독성이 많이 떨어지구나.. 라는 생각이 많이 든다.
-
-더 고민하고 더 공부하자..🤦‍♀️
-
+## 💡 Redis의 키 
+- 레디스는 하나의 키-값 데이터에 여러 키가 존재하는 것처럼 보일 수 있다. 그러면 여기서 드는 생각이 스키마를 깊고, 넓게 만들게 되면 성능에 악영향을 주진 않을까?
+- 레디스의 스키마는 RDS의 로우의 숫자와 비슷하게 동작하지 않는다고 한다. 즉 성능에 영향을 주지 않으며 RDS의 경우 탐색해야하는 로우가 많아지면 검색속도가 느려지다보니 인덱스 로우, 고유 키, 외래 키 등을 설정해 사용한다. 반면에 레디스는 O(1)의 수생시간을 가지고 많은 키건 적은 키건 스키마가 많건 적건 동일한 시간이 사용된다고 한다. 
 
 
 
