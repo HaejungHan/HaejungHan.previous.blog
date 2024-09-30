@@ -1,0 +1,113 @@
+---
+layout: post
+title:  "TIL(20240930) [데이터베이스/SQL-JOIN]"
+date:  2024-09-30
+categories: TIL
+---
+
+----------------------------------------------------------------------------
+
+이전에 제대로 이해하지 못했던 JOIN에 대해서 다시 공부를 해보려고 한다.
+이번 기회로 확실하게 inner join, outer join(left, right, full) 이해를 해보자!
+
+## 💡 데이터베이스 `JOIN`
+- join 이란? 둘 이상의 테이블을 연결해서 데이터를 검색하는 방법을 의미합니다.
+- 연결하려면 테이블이 적어도 하나의 컬럼을 공유하고 있어야 하고, 이 공유하고 있는 컬럼을 PK OR FK값으로 사용해야 합니다. 
+
+## 🚩JOIN 종류
+![image](https://github.com/user-attachments/assets/70288c48-bb2a-4fc1-9de8-059c73b85016)
+- INNER JOIN : 내부조인-> 교집합
+- LEFT/RIGHT JOIN: 부분집합
+- OUTER JOIN: 외부조인-> 합집합
+- ** 오라클은 OUTER JOIN이 있지만 MYSQL은 없기에 LEFT+RIGHT를 사용
+
+자 그럼 이제 실습해보자
+
+데이터는 고객테이블, 상품테이블이 있다.
+고객테이블에 no 이 primary key이며 상품테이블에는 고객테이블의 no의 fk customer_id가 있다.
+
+```
+create table customer
+(
+	no INT,
+    name varchar(10),
+    join_date date,
+    primary key(no)
+)
+```
+
+```
+create table product
+(
+	no INT,
+    name varchar(10),
+    price INT,
+    customer_id INT,
+    primary key(no),
+    foreign key(customer_id) references customer(no)
+)
+```
+
+### 🚩INNER JOIN 
+![image](https://github.com/user-attachments/assets/c94e77f1-75b4-43a0-addb-623468ca8643)
+#### 위 테이블에서 innerjoin을 한다고 가정했을 때 어떻게 이해할 수 있을까? 
+`select에서 요구한 데이터에 따라 customer과 product에 정확히 매핑되는 데이터만 가져온다.`
+
+그래서 다음과 같이 SQL문 명령어를 입력해보았고 결과를 확인할 수 있었다.
+
+```
+SELECT c.no, c.name, c.join_date, p.price FROM customer c INNER JOIN product p ON c.no = p.customer_id;
+```
+
+![image](https://github.com/user-attachments/assets/7c064a32-8e17-4efd-a145-9e09d63ecce2)
+
+### 🚩LEFT JOIN
+![image](https://github.com/user-attachments/assets/1cd503ad-636c-46c9-a2c9-f90ee60fe9eb)
+![image](https://github.com/user-attachments/assets/38ad2610-ce64-4718-9ece-649f2ef3dd90)
+#### LEFT JOIN은 두 가지: 공통된 부분+LEFT에 있는 거만/왼쪽에 있는거만 
+
+그래서 첫번째 그림대로 한다면 공통된 부분+LEFT에 있는 데이터를 가져오려고 한다. 
+
+```
+SELECT c.name, c.join_date, p.price FROM customer c LEFT OUTER JOIN product p ON c.no = p.customer_id;
+```
+
+![image](https://github.com/user-attachments/assets/49a531f9-b87e-49ce-80e1-da01454f2ea0)
+
+두 번째는 왼쪽에 있는거만
+
+```
+SELECT c.name, c.join_date FROM customer c LEFT OUTER JOIN product p ON c.no = p.customer_id WHERE p.customer_id is null;
+```
+-> 위와 같은 경우에는 customer과 product가 매핑되어있지 않는 데이터만 불러오게 되는 것
+
+![image](https://github.com/user-attachments/assets/e3aa58b8-ffbe-4bb1-af1d-b71a56802bc6)
+
+### 🚩RIGHT JOIN 
+![image](https://github.com/user-attachments/assets/745300e7-9ecb-4b8b-b136-6f713321aea1)
+![image](https://github.com/user-attachments/assets/76eef69f-d28c-486b-af2e-214e68395cd3)
+
+right도 left와 데이터를 가져오는 방식은 같지만 기준이 right라는 것!
+
+첫번째는 공통된 부분+ right에만 있는 데이터 가져오기
+
+```
+SELECT p.name, p.price, c.name FROM customer c RIGHT OUTER JOIN product p ON p.customer_id = c.no;
+```
+![image](https://github.com/user-attachments/assets/6c74af9a-d6f9-466b-b9bb-8027ae0e85b0)
+
+두 번째 오른쪽에 있는거만 가져오기
+
+```
+SELECT p.name, p.price FROM customer c RIGHT OUTER JOIN product p ON p.customer_id = c.no WHERE c.no is null;
+```
+데이터 결과셋이 없다.
+product에 매핑되어있지 않는 데이터가 없기 때문에
+
+### 🚩 FULL OUTER JOIN
+- 일단 현재 mariaDB를 사용중인데 mariaDB는 full outer join을 지원하지 않는다.
+- left+right를 혼합하여 union 명령어로 함께 사용해주어야 한다.
+
+
+참고
+[DB join정리](https://pearlluck.tistory.com/46)
