@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "TIL(20240730) []"
+title:  "TIL(20240730) [error:JAXB is unavailable]"
 date:  2024-07-30
 categories: TIL Vue.js
 ---
