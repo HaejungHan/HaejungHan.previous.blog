@@ -6,7 +6,7 @@ gemspec
 
 group :development do
   gem "wdm", "~> 0.2.0"
-  gem "tzinfo", "~> 1.0"
+  gem "tzinfo", "~> 2.0"
   gem "tzinfo-data"  # 추가된 부분
 end
 
