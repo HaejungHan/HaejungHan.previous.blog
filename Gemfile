@@ -15,4 +15,4 @@ gem "jekyll-paginate", "~> 1.1"
 gem "jekyll-sass-converter", "~> 3.0"
 gem "jekyll-seo-tag", "~> 2.7"
 
-
+gem 'bootstrap', '~> 5.0'  # 원하는 버전으로 조정
