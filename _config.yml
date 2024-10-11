@@ -147,7 +147,10 @@ pwa:
 paginate: 10
 
 # The base URL of your site
-baseurl: ""
+baseurl: "https://haejunghan.github.io"
+
+# Directory for Sass stylesheets
+sass_dir: assets/css
 
 # ------------ The following options are not recommended to be modified ------------------
 
